@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#FFDB00</color>
+    <color name="d_blue">#1E232C</color>
+    <color name="bg">#5D8073</color>
+    <color name="l_blue">#35C2C1</color>
+    <color name="grey">#666666</color>
+    <color name="teal">#008080</color>
+    <color name="red">#FF0000</color>
+    <color name="sunday_text">#FF0000</color>
+    <color name="default_text">#888888</color>
+    <color name="today_text">#000000</color>
+        <color name="darkGreen">#1D5923</color>
+        <color name="darkRed">#6E1616</color>
+        <color name="darkBlue">#1A3A5E</color>
+        <color name="orange">#FFA94D</color>
+    <color name="yellow">#FFFFD700</color> <!-- Golden Yellow -->
+    <color name="light_gray">#D3D3D3</color> <!-- Light Gray -->
+
+</resources>

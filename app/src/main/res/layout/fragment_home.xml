@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".HomeFragment"
+    android:background="@color/white">
+
+   <LinearLayout
+       android:id="@+id/linearLayout"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:gravity="center"
+       android:orientation="horizontal">
+
+      <ImageButton
+          android:id="@+id/menuButton"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:background="@null"
+          android:contentDescription="Menu"
+          android:src="@drawable/ic_menu" />
+
+      <ImageView
+          android:id="@+id/cupImage"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:background="@null"
+          android:contentDescription="Menu"
+          android:padding="10dp"
+          android:scaleType="centerInside"
+          android:src="@drawable/cup" />
+
+
+      <TextView
+          android:id="@+id/textView_streak_count"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerVertical="true"
+          android:layout_marginStart="8dp"
+          android:layout_toEndOf="@id/menuButton"
+          android:text="0"  android:textSize="18sp"
+          android:textStyle="bold" />
+
+      <ImageView
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:layout_centerVertical="true"
+          android:layout_marginStart="10dp"
+          android:contentDescription="Coins"
+          android:src="@drawable/ic_coin" />
+
+      <Space
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1" />
+
+      <ImageView
+          android:id="@+id/profileImage"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:layout_marginEnd="10dp"
+          android:background="@drawable/circle_outline"
+          android:contentDescription="Profile"
+          android:padding="5dp"
+          android:src="@drawable/profile_pic" />
+
+   </LinearLayout>
+
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@+id/linearLayout"
+       android:layout_marginTop="10dp">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/yellow_card_background"
+          android:orientation="vertical">
+
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_alignParentStart="true"
+             android:background="@drawable/group11"
+             android:orientation="horizontal"
+             android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:layout_marginTop="25dp"
+                   android:padding="10dp"
+                   android:text="Hello,"
+                   android:textSize="20sp" />
+
+               <TextView
+                   android:id="@+id/textView_user_name"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:padding="10dp"
+                   android:text="User Name"  android:textSize="24sp"
+                   android:textStyle="bold" />
+
+            </LinearLayout>
+
+         </RelativeLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="150dp"
+             android:background="@drawable/yellow_card_background"
+             android:gravity="center"
+             android:orientation="vertical"
+             android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/proteststrike_regular"
+                android:text="Your Progress for today"
+                android:textSize="20sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar_habit"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:progress="0"  android:progressBackgroundTint="@color/black"
+                android:progressDrawable="@drawable/custom_progress_bar" />
+         </LinearLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="#FFEB3B"
+             android:orientation="vertical"
+             android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Habit"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+               <TextView
+                   android:id="@+id/textView_days_count"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentStart="true"
+                   android:layout_marginTop="10dp"
+                   android:layout_marginStart="10dp"
+                   android:text="0"  android:textSize="50sp"
+                   android:textStyle="bold" />
+
+               <LinearLayout
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentEnd="true"
+                   android:layout_centerVertical="true"
+                   android:orientation="vertical">
+
+                  <ImageView
+                      android:layout_width="75dp"
+                      android:layout_height="73dp"
+                      android:contentDescription="Streak fire"
+                      android:src="@drawable/ic_fire" />
+
+                  <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:layout_marginEnd="4dp"
+                      android:text="Streak"
+                      android:textSize="20sp" />
+
+               </LinearLayout>
+            </RelativeLayout>
+
+         </LinearLayout>
+
+         <include
+             layout="@layout/streak"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="16dp" />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/calenderView"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             tools:itemCount="1"
+             app:spanCount="2"
+             tools:listitem="@layout/streak"
+             android:layout_marginStart="15dp"
+             android:layout_marginEnd="15dp"/>
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/monthCalenderRecyclerview"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             tools:itemCount="1"
+             app:spanCount="2"
+             tools:listitem="@layout/streak"
+             android:layout_marginStart="15dp"
+             android:layout_marginEnd="15dp"/>
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/timelineRecycler"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             tools:itemCount="1"
+             app:spanCount="2"
+             tools:listitem="@layout/streak"
+             android:layout_marginStart="15dp"
+             android:layout_marginEnd="15dp"/>
+
+      </LinearLayout>
+
+   </ScrollView>
+
+   <RelativeLayout
+       android:layout_width="wrap_content"
+       android:padding="10dp"
+       android:layout_gravity="end"
+       android:layout_alignParentEnd="true"
+       android:layout_marginBottom="40dp"
+       android:layout_marginEnd="20dp"
+       android:layout_alignParentBottom="true"
+       android:layout_height="wrap_content">
+
+      <ImageButton
+          android:id="@+id/addTaskButton"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:background="@drawable/circle_black_background"
+          android:src="@drawable/ic_add"
+          app:tint="@color/white" />
+
+   </RelativeLayout>
+
+</RelativeLayout>
