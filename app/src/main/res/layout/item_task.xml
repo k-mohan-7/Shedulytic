@@ -3,85 +3,88 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="6dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp">
+    app:cardElevation="3dp"
+    android:id="@+id/taskCardView"
+    android:layerType="hardware">
 
     <LinearLayout
         android:id="@+id/taskItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-        <!-- Top Row: Icon and Title -->
+        <!-- Left side: Icon -->
+        <ImageView
+            android:id="@+id/taskTypeIcon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Task Type Icon"
+            android:tint="#FFFFFF" />
+
+        <!-- Main content -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
 
-            <ImageView
-                android:id="@+id/taskTypeIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_vertical"
-                android:contentDescription="Task Type Icon" />
-
+            <!-- Top row: Title -->
             <TextView
                 android:id="@+id/taskTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="12dp"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/taskType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:textColor="#FFFFFF" />
-        </LinearLayout>
+                android:ellipsize="end"
+                android:maxLines="1" />
 
-        <!-- Middle Row: Time Information -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
-
+            <!-- Middle row: Time Information -->
             <TextView
                 android:id="@+id/taskTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:textColor="#333333"
-                android:textSize="16sp" />
+                android:textColor="#F0F0F0"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
 
+            <!-- Bottom row: Remaining Time -->
             <TextView
                 android:id="@+id/taskDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#666666"
-                android:textSize="14sp" />
+                android:textColor="#E0E0E0"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
-        <!-- Bottom Row: Activity Name -->
+        <!-- Right side: Task Type -->
         <TextView
-            android:id="@+id/activityName"
-            android:layout_width="match_parent"
+            android:id="@+id/taskType"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#333333"
-            android:textSize="16sp" />
+            android:layout_gravity="top"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginStart="8dp"
+            android:textColor="#FFFFFF" />
+            
+        <!-- Checkbox for completion -->
+        <CheckBox
+            android:id="@+id/taskCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="4dp"
+            android:button="@drawable/custom_checkbox" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

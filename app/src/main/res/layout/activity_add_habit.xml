@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f5f5f5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add New Habit"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/habit_color"
+            android:textColor="@color/black" />
+
+        <!-- Title Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Habit Title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/habit_title_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter habit title"
+            android:inputType="text"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/white"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey" />
+
+        <!-- Description Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description (Optional)"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/habit_description_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter habit description"
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/white"
+            android:textColor="@color/black"
+            android:textColorHint="@color/grey" />
+
+        <!-- Verification Method Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Verification Method"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Verification Methods as Box Layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <!-- Checkbox Verification Box -->
+            <LinearLayout
+                android:id="@+id/btn_trust_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#FFEB3B"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_check" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Checkbox"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+                    
+                <View
+                    android:id="@+id/checkbox_indicator"
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#000000"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Location Verification Box -->
+            <LinearLayout
+                android:id="@+id/btn_trust_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/remainder_color"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_location" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Location"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+                    
+                <View
+                    android:id="@+id/location_indicator"
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#000000"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Pomodoro Verification Box -->
+            <LinearLayout
+                android:id="@+id/btn_trust_pomodoro"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/workflow_color"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_timer" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pomodoro"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+                    
+                <View
+                    android:id="@+id/pomodoro_indicator"
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#000000"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Keep the RadioGroup for functionality but make it invisible -->
+        <RadioGroup
+            android:id="@+id/verification_method_radio_group"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone">
+            <RadioButton
+                android:id="@+id/checkbox_verification_radio"
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
+            <RadioButton
+                android:id="@+id/location_verification_radio"
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
+            <RadioButton
+                android:id="@+id/pomodoro_verification_radio"
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
+        </RadioGroup>        <!-- Checkbox verification container -->
+        <LinearLayout
+            android:id="@+id/checkbox_verification_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFF9C4"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Checkbox Verification"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#F57F17"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simply mark this habit as completed when you finish it. This verification method relies on your honesty."
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:background="@android:color/white"
+                android:layout_marginBottom="8dp" />
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_check"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>        <!-- Location verification container -->
+        <LinearLayout
+            android:id="@+id/location_verification_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#E8F5E8"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Location Verification"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/remainder_color"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Your habit will be verified when you are at a specific location. Set a location where you want to perform this habit."
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:background="@android:color/white"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/location_coordinates_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No location selected"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:background="@android:color/white"
+                android:layout_marginBottom="8dp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/select_location_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use Current Location"
+                android:backgroundTint="@color/remainder_color"
+                android:textColor="@color/white"
+                android:layout_marginBottom="4dp" />
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_location"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>        <!-- Pomodoro verification container -->
+        <LinearLayout
+            android:id="@+id/pomodoro_verification_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#F3E5F5"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pomodoro Verification"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/workflow_color"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Complete focused work sessions using the Pomodoro Technique. Set the number of sessions and duration needed to verify this habit."
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:background="@android:color/white"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number of Pomodoros:"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:layout_marginEnd="8dp"
+                    android:layout_gravity="center_vertical" />
+
+                <EditText
+                    android:id="@+id/pomodoro_count_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="1"
+                    android:textColor="@color/black"
+                    android:background="@android:color/white"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Duration (minutes):"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:layout_marginEnd="8dp"
+                    android:layout_gravity="center_vertical" />
+
+                <EditText
+                    android:id="@+id/pomodoro_duration_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="25"
+                    android:textColor="@color/black"
+                    android:background="@android:color/white"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_timer"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Frequency Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Habit Frequency"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/habit_frequency_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/grey"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/save_habit_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save Habit"
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/habit_dark_color"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView> 

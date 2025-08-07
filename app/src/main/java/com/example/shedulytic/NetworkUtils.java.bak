@@ -1,0 +1,534 @@
+package com.example.shedulytic;
+
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+
+/**
+ * Utility class for handling network operations with robust error handling
+ */
+public class NetworkUtils {
+    private static final String TAG = "NetworkUtils";
+    private static RequestQueue requestQueue;
+    
+    /**
+     * Test connectivity to server with detailed diagnostics
+     * @param context Application context
+     * @return true if server is reachable, false otherwise
+     */
+    public static boolean testServerConnectivity(Context context) {
+        if (!IpV4Connection.isNetworkAvailable(context)) {
+            Log.e(TAG, "Network is not available");
+            return false;
+        }
+        
+        // Try each possible server URL
+        String[] urlsToTry = {
+            IpV4Connection.getBaseUrl() + "ping.php",
+            IpV4Connection.getFallbackUrl() + "ping.php"
+        };
+        
+        for (String urlToTest : urlsToTry) {
+            Log.d(TAG, "Testing connectivity to: " + urlToTest);
+            boolean isReachable = testUrlConnectivity(urlToTest);
+            if (isReachable) {
+                Log.d(TAG, "Successfully connected to: " + urlToTest);
+                return true;
+            }
+        }
+        
+        Log.e(TAG, "Could not connect to any server URLs");
+        return false;
+    }
+    
+    /**
+     * Test connectivity to a specific URL with detailed diagnostics
+     */
+    private static boolean testUrlConnectivity(String urlString) {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setDoOutput(false);
+            connection.setRequestProperty("Connection", "close");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.connect();
+            
+            int responseCode = connection.getResponseCode();
+            Log.d(TAG, "Response code from " + urlString + ": " + responseCode);
+            
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // Try to read response to check for HTML
+                try (InputStream in = connection.getInputStream()) {
+                    byte[] buffer = new byte[200];
+                    int bytesRead = in.read(buffer);
+                    if (bytesRead > 0) {
+                        String response = new String(buffer, 0, bytesRead);
+                        Log.d(TAG, "Response preview: " + response.substring(0, Math.min(50, response.length())));
+                        
+                        if (response.contains("<html") || response.contains("<!DOCTYPE")) {
+                            Log.e(TAG, "URL returned HTML instead of expected format");
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.e(TAG, "Error testing URL " + urlString + ": " + e.getMessage());
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Initialize the RequestQueue
+     */
+    public static void initialize(Context context) {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+        }
+    }
+
+    /**
+     * Get the RequestQueue instance
+     */
+    public static RequestQueue getRequestQueue(Context context) {
+        if (requestQueue == null) {
+            initialize(context);
+        }
+        return requestQueue;
+    }
+
+    /**
+     * Interface for JSON response callbacks
+     */
+    public interface JsonResponseCallback {
+        void onSuccess(JSONObject response);
+        void onError(String errorMessage);
+    }
+
+    /**
+     * Check for specific connection issues with the problematic IP address
+     */
+    public static boolean checkSpecificIpConnectivity(Context context, String ipAddress) {
+        if (!IpV4Connection.isNetworkAvailable(context)) {
+            return false;
+        }
+        
+        // Try to ping the specific IP address
+        String testUrl = "http://" + ipAddress + "/schedlytic/ping.php";
+        Log.d(TAG, "Testing specific IP connectivity to: " + testUrl);
+        
+        return testUrlConnectivity(testUrl);
+    }
+    
+    /**
+     * Make a JSON request with improved error handling and connectivity testing
+     */
+    public static void makeJsonRequest(Context context, String url, JSONObject jsonRequest,
+                                      final JsonResponseCallback callback) {
+        if (!IpV4Connection.isNetworkAvailable(context)) {
+            callback.onError("Network connection is not available");
+            return;
+        }
+        
+        // Check if we're trying to connect to the problematic IP
+        if (url.contains("192.168.131.64")) {
+            // Test connectivity to this specific IP first
+            if (!checkSpecificIpConnectivity(context, "192.168.131.64")) {
+                Log.e(TAG, "Cannot connect to 192.168.131.64, trying fallback immediately");
+                // Skip directly to fallback URL
+                String fallbackUrl = url.replace("192.168.131.64", "10.0.2.2");
+                makeJsonRequestWithUrl(context, fallbackUrl, jsonRequest, callback);
+                return;
+            }
+        }
+
+        // Try with primary URL first
+        makeJsonRequestWithUrl(context, url, jsonRequest, new JsonResponseCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // If primary URL fails, try with fallback URL
+                if (url.contains(IpV4Connection.getBaseUrl())) {
+                    String fallbackUrl = url.replace(IpV4Connection.getBaseUrl(), IpV4Connection.getFallbackUrl());
+                    Log.d(TAG, "Primary URL failed, trying fallback URL: " + fallbackUrl);
+                    
+                    makeJsonRequestWithUrl(context, fallbackUrl, jsonRequest, callback);
+                } else {
+                    callback.onError(errorMessage);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Internal method to make a JSON request to a specific URL
+     */
+    private static void makeJsonRequestWithUrl(Context context, String url, JSONObject jsonRequest,
+                                             final JsonResponseCallback callback) {
+        Log.d(TAG, "Making request to: " + url);
+        
+        // Log the request body for debugging
+        Log.d(TAG, "Request body: " + (jsonRequest != null ? jsonRequest.toString() : "null"));
+        
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST, url, jsonRequest,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            // Log the raw response for debugging
+                            String jsonString = response.toString();
+                            Log.d(TAG, "Raw response: " + jsonString.substring(0, Math.min(500, jsonString.length())));
+                            
+                            // Check if response contains HTML markers which would indicate a non-JSON response
+                            if (jsonString.contains("<html") || jsonString.contains("<!DOCTYPE") ||
+                                jsonString.contains("<br") || jsonString.contains("<body")) {
+                                Log.e(TAG, "Received HTML instead of JSON");
+                                callback.onError("Server returned HTML instead of JSON. Please check server configuration.");
+                                return;
+                            }
+                            
+                            // Validate that the response is proper JSON
+                            new JSONObject(jsonString); // This will throw if not valid JSON
+                            callback.onSuccess(response);
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Invalid JSON response: " + e.getMessage());
+                            callback.onError("Invalid JSON response: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMessage;
+                        if (error.networkResponse != null) {
+                            // Try to get more details from the error response
+                            int statusCode = error.networkResponse.statusCode;
+                            String data = "";
+                            try {
+                                data = new String(error.networkResponse.data, "UTF-8");
+                                Log.e(TAG, "Error response data: " + data);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Could not parse error response data", e);
+                            }
+                            
+                            errorMessage = "Network error (" + statusCode + "): " + 
+                                         (error.getMessage() != null ? error.getMessage() : "Unknown error") + 
+                                         (data.isEmpty() ? "" : " - " + data);
+                        } else if (error.getCause() instanceof JSONException) {
+                            errorMessage = "JSON parsing error: " + error.getCause().getMessage();
+                        } else if (error.getCause() instanceof java.net.ConnectException) {
+                            errorMessage = "Could not connect to server. Please check your network connection and server status.";
+                        } else {
+                            errorMessage = "Network error: " + (error.getMessage() != null ? error.getMessage() : "Unknown error");
+                        }
+                        Log.e(TAG, "Request failed: " + errorMessage + " for URL: " + url);
+                        callback.onError(errorMessage);
+                    }
+                });
+
+
+        // Add custom headers to improve connection reliability
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                45000, // 45 seconds timeout
+                3, // 3 retries
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        
+        // Add custom headers to help with connection issues
+        jsonObjectRequest.setShouldCache(false); // Disable caching to avoid stale responses
+        jsonObjectRequest.setHeaders(new HashMap<String, String>() {{
+            put("Connection", "close"); // Prevent connection reuse issues
+            put("Accept", "application/json"); // Explicitly request JSON
+            put("Content-Type", "application/json; charset=utf-8"); // Ensure proper content type
+        }});
+
+        // Add to request queue
+        getRequestQueue(context).add(jsonObjectRequest);
+    }
+    
+    /**
+     * Make a GET request with robust error handling and connectivity testing
+     */
+    public static void makeGetRequest(Context context, String url, JsonResponseCallback callback) {
+        if (!IpV4Connection.isNetworkAvailable(context)) {
+            callback.onError("Network connection is not available");
+            return;
+        }
+        
+        // Check if we're trying to connect to the problematic IP
+        if (url.contains("192.168.131.64")) {
+            // Test connectivity to this specific IP first
+            if (!checkSpecificIpConnectivity(context, "192.168.131.64")) {
+                Log.e(TAG, "Cannot connect to 192.168.131.64, trying fallback immediately");
+                // Skip directly to fallback URL
+                String fallbackUrl = url.replace("192.168.131.64", "10.0.2.2");
+                makeGetRequestWithUrl(context, fallbackUrl, callback);
+                return;
+            }
+        }
+
+        // Try with primary URL first
+        makeGetRequestWithUrl(context, url, new JsonResponseCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // If primary URL fails, try with fallback URL
+                if (url.contains(IpV4Connection.getBaseUrl())) {
+                    String fallbackUrl = url.replace(IpV4Connection.getBaseUrl(), IpV4Connection.getFallbackUrl());
+                    Log.d(TAG, "Primary URL failed, trying fallback URL: " + fallbackUrl);
+                    
+                    makeGetRequestWithUrl(context, fallbackUrl, callback);
+                } else {
+                    callback.onError(errorMessage);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Internal method to make a GET request to a specific URL
+     */
+    private static void makeGetRequestWithUrl(Context context, String url, JsonResponseCallback callback) {
+        Log.d(TAG, "Making GET request to: " + url);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            response -> {
+                try {
+                    // Log the raw response for debugging
+                    Log.d(TAG, "Raw GET response: " + response.substring(0, Math.min(500, response.length())));
+                    
+                    // Check if response contains HTML
+                    if (response.contains("<html") || response.contains("<br") ||
+                        response.contains("<!DOCTYPE") || response.contains("<body")) {
+                        Log.e(TAG, "Received HTML instead of JSON: " + response.substring(0, Math.min(100, response.length())));
+                        callback.onError("Server returned HTML instead of JSON. Please check server configuration.");
+                        return;
+                    }
+                    
+                    // Check if response is empty
+                    if (response.trim().isEmpty()) {
+                        Log.e(TAG, "Received empty response");
+                        callback.onError("Server returned empty response");
+                        return;
+                    }
+                    
+                    // Try to parse the response as JSON
+                    JSONObject jsonResponse = new JSONObject(response);
+                    callback.onSuccess(jsonResponse);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Invalid JSON response: " + e.getMessage() + ", Response: " + 
+                          (response.length() > 100 ? response.substring(0, 100) + "..." : response));
+                    callback.onError("Invalid JSON response: " + e.getMessage());
+                }
+            },
+            error -> {
+                String errorMessage;
+                if (error.networkResponse != null) {
+                    // Try to get more details from the error response
+                    int statusCode = error.networkResponse.statusCode;
+                    String data = "";
+                    try {
+                        data = new String(error.networkResponse.data, "UTF-8");
+                        Log.e(TAG, "Error response data: " + data);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Could not parse error response data", e);
+                    }
+                    
+                    errorMessage = "Network error (" + statusCode + "): " + 
+                                 (error.getMessage() != null ? error.getMessage() : "Unknown error") + 
+                                 (data.isEmpty() ? "" : " - " + data);
+                } else if (error.getCause() instanceof JSONException) {
+                    errorMessage = "JSON parsing error: " + error.getCause().getMessage();
+                } else if (error.getCause() instanceof java.net.ConnectException) {
+                    errorMessage = "Could not connect to server. Please check your network connection and server status.";
+                } else {
+                    errorMessage = "Network error: " + (error.getMessage() != null ? error.getMessage() : "Unknown error");
+                }
+                Log.e(TAG, "Request failed: " + errorMessage + " for URL: " + url);
+                callback.onError(errorMessage);
+            });
+
+        // Add custom headers to improve connection reliability
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                45000, // 45 seconds timeout
+                3, // 3 retries
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        
+        // Add custom headers to help with connection issues
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Connection", "close"); // Prevent connection reuse issues
+        headers.put("Accept", "application/json"); // Explicitly request JSON
+        stringRequest.setHeaders(headers);
+
+        // Add to request queue
+        getRequestQueue(context).add(stringRequest);
+    }
+    }
+
+
+
+    /**
+     * Make a POST request with robust error handling and connectivity testing
+     */
+    public static void makePostRequest(Context context, String url, JSONObject requestBody, JsonResponseCallback callback) {
+        if (!IpV4Connection.isNetworkAvailable(context)) {
+            callback.onError("Network connection is not available");
+            return;
+        }
+        
+        // Check if we're trying to connect to the problematic IP
+        if (url.contains("192.168.56.64")) {
+            // Test connectivity to this specific IP first
+            if (!checkSpecificIpConnectivity(context, "192.168.56.64")) {
+                Log.e(TAG, "Cannot connect to 192.168.56.64, trying fallback immediately");
+                // Skip directly to fallback URL
+                String fallbackUrl = url.replace("192.168.56.64", "10.0.2.2");
+                makePostRequestWithUrl(context, fallbackUrl, requestBody, callback);
+                return;
+            }
+        }
+
+        // Try with primary URL first
+        makePostRequestWithUrl(context, url, requestBody, new JsonResponseCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                callback.onSuccess(response);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // If primary URL fails, try with fallback URL
+                if (url.contains(IpV4Connection.getBaseUrl())) {
+                    String fallbackUrl = url.replace(IpV4Connection.getBaseUrl(), IpV4Connection.getFallbackUrl());
+                    Log.d(TAG, "Primary URL failed, trying fallback URL: " + fallbackUrl);
+                    
+                    makePostRequestWithUrl(context, fallbackUrl, requestBody, callback);
+                } else {
+                    callback.onError(errorMessage);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Internal method to make a POST request to a specific URL
+     */
+    private static void makePostRequestWithUrl(Context context, String url, JSONObject requestBody, JsonResponseCallback callback) {
+        Log.d(TAG, "Making POST request to: " + url);
+        
+        // Log the request body for debugging
+        Log.d(TAG, "POST request body: " + (requestBody != null ? requestBody.toString() : "null"));
+
+        // Create a custom JsonObjectRequest that handles HTML responses
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, requestBody,
+            response -> {
+                try {
+                    // Log the raw response for debugging
+                    String responseString = response.toString();
+                    Log.d(TAG, "Raw POST response: " + responseString.substring(0, Math.min(500, responseString.length())));
+                    
+                    // Check if response is valid JSON by converting to string and checking for HTML
+                    if (responseString.contains("<html") || responseString.contains("<br") ||
+                        responseString.contains("<!DOCTYPE") || responseString.contains("<body")) {
+                        Log.e(TAG, "Received HTML instead of JSON: " + responseString.substring(0, Math.min(100, responseString.length())));
+                        callback.onError("Server returned HTML instead of JSON. Please check server configuration.");
+                        return;
+                    }
+                    
+                    // Additional validation for the response
+                    if (response.length() == 0) {
+                        Log.e(TAG, "Received empty JSON object");
+                        callback.onError("Server returned empty response");
+                        return;
+                    }
+                    
+                    Log.d(TAG, "Successfully received valid JSON response");
+                    callback.onSuccess(response);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error processing response: " + e.getMessage(), e);
+                    callback.onError("Error processing server response: " + e.getMessage());
+                }
+            },
+            error -> {
+                String errorMessage;
+                if (error.networkResponse != null) {
+                    // Try to get more details from the error response
+                    int statusCode = error.networkResponse.statusCode;
+                    String data = "";
+                    try {
+                        data = new String(error.networkResponse.data, "UTF-8");
+                        Log.e(TAG, "Error response data: " + data);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Could not parse error response data", e);
+                    }
+                    
+                    errorMessage = "Network error (" + statusCode + "): " + 
+                                 (error.getMessage() != null ? error.getMessage() : "Unknown error") + 
+                                 (data.isEmpty() ? "" : " - " + data);
+                } else if (error.getCause() instanceof JSONException) {
+                    errorMessage = "JSON parsing error: " + error.getCause().getMessage();
+                } else if (error.getCause() instanceof java.net.ConnectException) {
+                    errorMessage = "Could not connect to server. Please check your network connection and server status.";
+                } else {
+                    errorMessage = "Network error: " + (error.getMessage() != null ? error.getMessage() : "Unknown error");
+                }
+                Log.e(TAG, "Request failed: " + errorMessage + " for URL: " + url);
+                callback.onError(errorMessage);
+            });
+
+        // Add custom headers to improve connection reliability
+        jsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                45000, // 45 seconds timeout
+                3, // 3 retries
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        
+        // Add custom headers to help with connection issues
+        jsonRequest.setShouldCache(false); // Disable caching to avoid stale responses
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Connection", "close"); // Prevent connection reuse issues
+        headers.put("Accept", "application/json"); // Explicitly request JSON
+        headers.put("Content-Type", "application/json; charset=utf-8"); // Ensure proper content type
+        jsonRequest.setHeaders(headers);
+
+        // Add to request queue
+        getRequestQueue(context).add(jsonRequest);
+    }
+    }
+
+
+}

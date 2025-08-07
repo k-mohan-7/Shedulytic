@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:background="@drawable/location_verification_background">
+
+        <!-- Verification type indicator in top right with emission -->
+        <TextView
+            android:id="@+id/verification_type_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:text="LOCATION"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#1B5E20"
+            android:background="@drawable/verification_type_background"
+            android:padding="12dp"
+            android:layout_margin="6dp"
+            android:elevation="8dp" />
+
+        <!-- Container for centered content -->
+        <LinearLayout
+            android:id="@+id/center_content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/verification_type_indicator"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- Location icon centered with dark green emission -->
+            <ImageView
+                android:id="@+id/location_icon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_location"
+                android:layout_gravity="center"
+                android:padding="12dp"
+                android:elevation="8dp"
+                android:contentDescription="Location icon" />
+
+            <!-- Content centered with better spacing -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <!-- Title with bold styling -->
+                <TextView
+                    android:id="@+id/location_verification_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Habit Title"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:gravity="center"
+                    android:elevation="1dp" />
+
+                <!-- Description with improved spacing -->
+                <TextView
+                    android:id="@+id/location_verification_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="You need to be at the specified location to verify this habit."
+                    android:textColor="#555555"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:maxWidth="280dp" />
+
+                <!-- Verify button with enhanced styling -->
+                <Button
+                    android:id="@+id/verify_location_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/dark_green_button_shadow"
+                    android:theme="@style/Theme.DarkGreenButton"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="Verify Location"
+                    android:layout_gravity="center"
+                    android:elevation="6dp"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="16dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView> 

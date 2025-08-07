@@ -1,0 +1,40 @@
+initscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.gradle:gradle-tooling-api:8.11.1'
+    }
+}
+
+allprojects {
+    plugins.withId('java') {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
+        }
+    }
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
+    }
+}
+
+// Configure Java toolchain repositories
+gradle.projectsLoaded {
+    gradle.rootProject {
+        if (extensions.findByName('javaToolchains')) {
+            extensions.getByName('javaToolchains').with {
+                javaRepositories {
+                    repository {
+                        uri = uri("https://api.adoptium.net/v3/binary/latest/17/ga/windows/x64/jdk/hotspot/normal/eclipse")
+                    }
+                }
+            }
+        }
+    }
+}

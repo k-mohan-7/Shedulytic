@@ -173,7 +173,12 @@ public class TimelineActivity extends AppCompatActivity {
                             taskList.addAll(newTaskList);
                             processRepeatingTasks();
                             runOnUiThread(() -> {
-                                updateTimeline();
+                                if (taskList.isEmpty()) {
+                                    // Show empty state message
+                                    showEmptyStateMessage();
+                                } else {
+                                    updateTimeline();
+                                }
                                 isRefreshing = false;
                             });
                         } else {
@@ -521,6 +526,33 @@ public class TimelineActivity extends AppCompatActivity {
 
     private void deleteTask(String taskId) {
         Toast.makeText(this, "Deleting task: " + taskId, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Shows an empty state message when no tasks are available
+     */
+    private void showEmptyStateMessage() {
+        timelineContainer.removeAllViews();
+
+        // Create a TextView for the empty state message
+        TextView emptyStateText = new TextView(this);
+        emptyStateText.setText("No activities added. Please add something.");
+        emptyStateText.setTextSize(18);
+        emptyStateText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        emptyStateText.setGravity(Gravity.CENTER);
+
+        // Create layout parameters
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(16, 48, 16, 16);
+        emptyStateText.setLayoutParams(params);
+
+        // Add to the container
+        timelineContainer.addView(emptyStateText);
+
+        Log.d(TAG, "Showing empty state message");
     }
 
     @Override

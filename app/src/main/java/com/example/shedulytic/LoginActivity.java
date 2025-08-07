@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.shedulytic.ui.login.IpV4Connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 import android.util.Log;
@@ -18,6 +17,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
     private EditText emailInput;
     private EditText passwordInput;
     private Button loginButton;
@@ -51,38 +51,79 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String password) {
+        // Show loading message
+        runOnUiThread(() -> Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show());
+
         new Thread(() -> {
+            HttpURLConnection conn = null;
             try {
-                URL url = new URL(IpV4Connection.getBaseUrl() + "login.php");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
+                // Try multiple server URLs in sequence
+                String[] serverUrls = {
+                    "http://192.168.53.64/schedlytic/",
+                    "http://10.0.2.2/schedlytic/",
+                    "http://10.0.2.2:80/schedlytic/",
+                    "http://127.0.0.1/schedlytic/",
+                    "http://localhost/schedlytic/"
+                };
+                
+                boolean connected = false;
+                String responseData = "";
+                int responseCode = 0;
+                
+                // Try each URL until one works
+                for (String baseUrl : serverUrls) {
+                    try {
+                        Log.d(TAG, "Trying to connect to: " + baseUrl);
+                        URL url = new URL(baseUrl + "login.php");
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setDoOutput(true);
+                        conn.setConnectTimeout(10000); // 10 seconds timeout
+                        conn.setReadTimeout(10000);
 
-                JSONObject requestBody = new JSONObject();
-                requestBody.put("email", email);
-                requestBody.put("password", password);
+                        JSONObject requestBody = new JSONObject();
+                        requestBody.put("email", email);
+                        requestBody.put("password", password);
 
-                OutputStream os = conn.getOutputStream();
-                os.write(requestBody.toString().getBytes("UTF-8"));
-                os.close();
+                        OutputStream os = conn.getOutputStream();
+                        os.write(requestBody.toString().getBytes("UTF-8"));
+                        os.close();
 
-                int responseCode = conn.getResponseCode();
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    runOnUiThread(() -> Toast.makeText(this, "Server Error: " + responseCode, Toast.LENGTH_SHORT).show());
+                        responseCode = conn.getResponseCode();
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            Scanner scanner = new Scanner(conn.getInputStream(), "UTF-8");
+                            StringBuilder response = new StringBuilder();
+                            while (scanner.hasNextLine()) {
+                                response.append(scanner.nextLine());
+                            }
+                            scanner.close();
+                            
+                            responseData = response.toString();
+                            Log.d(TAG, "Response: " + responseData);
+                            connected = true;
+                            break; // Success, exit the loop
+                        } else {
+                            Log.d(TAG, "Server returned error code: " + responseCode);
+                            if (conn != null) conn.disconnect();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error connecting to " + baseUrl + ": " + e.getMessage());
+                        if (conn != null) conn.disconnect();
+                    }
+                }
+                
+                if (!connected) {
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, 
+                        "Could not connect to server. Please check your network connection.", 
+                        Toast.LENGTH_LONG).show());
                     return;
                 }
-
-                Scanner scanner = new Scanner(conn.getInputStream());
-                StringBuilder response = new StringBuilder();
-                while (scanner.hasNext()) {
-                    response.append(scanner.nextLine());
-                }
-                scanner.close();
-
-                // Improved error handling for JSON parsing
+                
+                // Process the response
+                final String finalResponseData = responseData;
                 try {
-                    JSONObject jsonResponse = new JSONObject(response.toString());
+                    JSONObject jsonResponse = new JSONObject(finalResponseData);
                     String status = jsonResponse.optString("status", "error");
 
                     runOnUiThread(() -> {
@@ -90,25 +131,45 @@ public class LoginActivity extends AppCompatActivity {
                             if ("success".equals(status)) {
                                 JSONObject user = jsonResponse.getJSONObject("user");
                                 String userId = user.getString("user_id");
-                                
+
                                 // Store user_id in SharedPreferences with commit for immediate write
                                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.putString("user_id", userId);
-                                editor.commit(); // Using commit instead of apply for immediate effect
 
-                                // Get username from response if available
+                                // Get username from response with better fallback handling
                                 String username = "";
-                                if (user.has("username")) {
+                                if (user.has("username") && !user.isNull("username")) {
                                     username = user.getString("username");
-                                    // Store username in SharedPreferences
-                                    editor.putString("username", username);
+                                } else if (user.has("name") && !user.isNull("name")) {
+                                    username = user.getString("name");
+                                } else if (user.has("email") && !user.isNull("email")) {
+                                    // Use email as last resort for display name
+                                    username = user.getString("email").split("@")[0];
                                 }
-                                
+
+                                // Store username in SharedPreferences
+                                if (!username.isEmpty()) {
+                                    editor.putString("username", username);
+                                    Log.d(TAG, "Stored username: " + username);
+                                }
+
+                                // Store XP points with default value if not available
+                                int xpPoints = 0;
+                                if (user.has("xp_points") && !user.isNull("xp_points")) {
+                                    xpPoints = user.getInt("xp_points");
+                                }
+                                editor.putInt("xp_points", xpPoints);
+                                Log.d(TAG, "Stored XP points: " + xpPoints);
+
+                                // Commit all changes at once
+                                editor.commit();
+
                                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(LoginActivity.this, HomepageActivity.class);
-                                intent.putExtra("user_id", userId); // Pass user_id to HomepageActivity
-                                intent.putExtra("username", username); // Pass username to HomepageActivity
+                                intent.putExtra("user_id", userId);
+                                intent.putExtra("username", username);
+                                intent.putExtra("xp_points", xpPoints);
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -116,17 +177,25 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
+                            Log.e(TAG, "Error parsing user data: " + e.getMessage(), e);
                             Toast.makeText(this, "Error parsing user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            e.printStackTrace();
                         }
-                });
+                    });
                 } catch (JSONException e) {
-                    Log.e("JSON Error", "Error parsing JSON: " + e.getMessage());
-                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, "Server parser failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    Log.e(TAG, "Error parsing JSON: " + e.getMessage(), e);
+                    runOnUiThread(() -> Toast.makeText(LoginActivity.this, 
+                        "Server response error: " + e.getMessage(), 
+                        Toast.LENGTH_LONG).show());
                 }
             } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show());
-                e.printStackTrace();
+                Log.e(TAG, "Network error: " + e.getMessage(), e);
+                runOnUiThread(() -> Toast.makeText(this, 
+                    "Network error: " + e.getMessage(), 
+                    Toast.LENGTH_LONG).show());
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
         }).start();
     }

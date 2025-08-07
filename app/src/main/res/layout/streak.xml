@@ -1,289 +1,331 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="10dp"
-    tools:context=".StreakFragment">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginTop="12dp"
+    android:background="@drawable/simple_card_background"
+    android:elevation="8dp"
+    android:orientation="vertical"
+    android:padding="20dp">
 
+    <!-- Days of Week Container -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:layout_marginBottom="8dp">
 
+        <!-- Monday -->
         <TextView
             android:id="@+id/weekDayText1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="MON"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="24"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView1"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon1"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Tuesday -->
         <TextView
             android:id="@+id/weekDayText2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="TUE"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="25"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView2"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon2"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Wednesday -->
         <TextView
             android:id="@+id/weekDayText3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="WED"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="26"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView3"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon3"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Thursday -->
         <TextView
             android:id="@+id/weekDayText4"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="THU"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="27"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView4"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon4"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Friday -->
         <TextView
             android:id="@+id/weekDayText5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="FRI"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="28"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView5"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon5"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Saturday -->
         <TextView
             android:id="@+id/weekDayText6"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="SAT"
-            android:textSize="12sp"
-            android:textColor="@color/grey"/>
-
-        <TextView
-            android:id="@+id/dayTextView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="29"
-            android:textSize="16sp"
+            android:textSize="13sp"
+            android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/grey"/>
+            android:textColor="@color/grey" />
 
-        <ImageView
-            android:id="@+id/streakImageView6"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
-
-        <ImageView
-            android:id="@+id/streakFireIcon6"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        <!-- Sunday -->
         <TextView
             android:id="@+id/weekDayText7"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="SUN"
-            android:textSize="12sp"
-            android:textColor="@color/sunday_text"/>
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/sunday_text" />
+    </LinearLayout>
 
+    <!-- Dates Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:layout_marginBottom="16dp">
+
+        <!-- Date 1 -->
+        <TextView
+            android:id="@+id/dayTextView1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 2 -->
+        <TextView
+            android:id="@+id/dayTextView2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 3 -->
+        <TextView
+            android:id="@+id/dayTextView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 4 -->
+        <TextView
+            android:id="@+id/dayTextView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 5 -->
+        <TextView
+            android:id="@+id/dayTextView5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 6 -->
+        <TextView
+            android:id="@+id/dayTextView6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 7 -->
         <TextView
             android:id="@+id/dayTextView7"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="30"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/sunday_text"/>
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+    </LinearLayout>
 
-        <ImageView
-            android:id="@+id/streakImageView7"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/circle_filled"/>
+    <!-- Fire Icons Container with White Circle Backgrounds -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7">
 
-        <ImageView
-            android:id="@+id/streakFireIcon7"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_flame"
-            android:visibility="gone"/>
+        <!-- Fire Icon 1 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon1"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 2 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 3 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon3"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 4 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon4"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 5 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon5"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 6 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon6"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 7 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon7"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
     </LinearLayout>
 </LinearLayout>

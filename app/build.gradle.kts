@@ -1,11 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.kotlin.android)
+    // This is a Java-only project, no Kotlin plugins needed
 }
 
-// Apply the custom force clean script
-apply(from = "forceclean.gradle.kts")
+// Make sure to apply the Android Gradle Plugin correctly
+
+// Configure Java toolchain for AGP 8.2.0
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 
 android {
     namespace = "com.example.shedulytic"
@@ -32,54 +37,90 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    // Removed kotlinOptions block as this is a Java-only project
 
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        buildConfig = true
     }
-    
 
-    // Clean task configuration to force delete locked files
-    tasks.withType<Delete> {
-        delete.apply {
-            setFollowSymlinks(true)
-        }
-    }
-    
-    // Prevent test task failures
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-            all {
-                it.jvmArgs("-XX:MaxMetaspaceSize=1536m", "-Xmx1536m", "--add-opens=java.base/java.lang=ALL-UNNAMED")
-                it.maxHeapSize = "1536m"
+    sourceSets {
+        getByName("main") {
+            java {
+                srcDirs("src/main/java")
             }
         }
+    }
+
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE*"
+            excludes += "META-INF/NOTICE*"
+        }
+    }
+
+    // Clean task configuration - simplified
+    tasks.register("cleanBuildCache") {
+        doLast {
+            project.buildDir.deleteRecursively()
+        }
+    }
+    
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
 dependencies {
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.activity)
-    implementation(libs.constraintlayout)
-    implementation(libs.annotation)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.play.services.maps)
+    // Core Android dependencies
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.activity:activity:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.annotation:annotation:1.6.0")
+    
+    // Lifecycle components (Java versions)
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+    
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    
+    // Network & Data
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.code.gson:gson:2.10.1")
+    
+    // UI Components
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.play.services.location)
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.core:core:1.12.0")
+    
+    // Test dependencies
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.3.1")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-
-    // Data binding is now handled by the Android Gradle Plugin
-    // Removed explicit databinding compiler dependency
+    // Room database
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    
+    // OSMDroid for OpenStreetMap
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 }
