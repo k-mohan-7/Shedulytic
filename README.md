@@ -34,7 +34,7 @@ Shedulytic is a comprehensive Android application designed to help users manage 
 - Quick access to task and habit creation
 - Real-time progress tracking
 - Integrated timeline view
-![home}(https://github.com/k-mohan-7/Shedulytic/blob/main/Home_screen.jpg)
+![home](https://github.com/k-mohan-7/Shedulytic/blob/main/Home_screen.jpg)
 
 
 #### 2. **TaskFragment** 
