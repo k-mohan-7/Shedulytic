@@ -34,19 +34,21 @@ Shedulytic is a comprehensive Android application designed to help users manage 
 - Quick access to task and habit creation
 - Real-time progress tracking
 - Integrated timeline view
+(https://github.com/k-mohan-7/Shedulytic/blob/main/Home_screen.jpg)
+
 
 #### 2. **TaskFragment** 
 - Comprehensive task management interface
 - Support for workflow and reminder task types
 - Task completion tracking with server synchronization
 - Advanced filtering and sorting options
-
+(https://github.com/k-mohan-7/Shedulytic/blob/main/Task_Management.jpg)
 #### 3. **HabitFragment**
 - Dedicated habit management interface
 - Multiple verification methods (checkbox, location, Pomodoro)
 - Daily habit scheduling and frequency management
 - Progress visualization and streak tracking
-
+(https://github.com/k-mohan-7/Shedulytic/blob/main/Habits_Management.jpg)
 #### 4. **StreakFragment**
 - Visual streak calendar with fire icons
 - Detailed progress analytics
@@ -58,7 +60,7 @@ Shedulytic is a comprehensive Android application designed to help users manage 
 - Settings and preferences
 - Account information
 - App configuration options
-
+https://github.com/k-mohan-7/Shedulytic/blob/main/Profile_Management.jpg)
 ### Key Activities
 
 #### **AddTaskActivity / AddHabitActivity**
