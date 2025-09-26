@@ -48,7 +48,7 @@ Shedulytic is a comprehensive Android application designed to help users manage 
 - Multiple verification methods (checkbox, location, Pomodoro)
 - Daily habit scheduling and frequency management
 - Progress visualization and streak tracking
-(https://github.com/k-mohan-7/Shedulytic/blob/main/Habits_Management.jpg)
+![Habits](https://github.com/k-mohan-7/Shedulytic/blob/main/Habits_Management.jpg)
 #### 4. **StreakFragment**
 - Visual streak calendar with fire icons
 - Detailed progress analytics
@@ -60,7 +60,7 @@ Shedulytic is a comprehensive Android application designed to help users manage 
 - Settings and preferences
 - Account information
 - App configuration options
-https://github.com/k-mohan-7/Shedulytic/blob/main/Profile_Management.jpg)
+![profile](https://github.com/k-mohan-7/Shedulytic/blob/main/Profile_Management.jpg)
 ### Key Activities
 
 #### **AddTaskActivity / AddHabitActivity**
