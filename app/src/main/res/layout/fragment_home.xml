@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".HomeFragment"
+    android:background="@color/white">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+       android:id="@+id/swipeRefresh"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_below="@+id/linearLayout"
+       android:layout_marginTop="10dp"
+        tools:ignore="NotSibling">
+       
+       <ScrollView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@drawable/yellow_card_background"
+          android:orientation="vertical">
+
+          <LinearLayout
+              android:id="@+id/linearLayout"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginHorizontal="8dp"
+              android:layout_marginTop="8dp"
+              android:background="@drawable/simple_card_background"
+              android:elevation="8dp"
+              android:gravity="center"
+              android:orientation="horizontal"
+              android:padding="12dp">
+
+              <ImageButton
+                  android:id="@+id/menuButton"
+                  android:layout_width="48dp"
+                  android:layout_height="48dp"
+                  android:background="@null"
+                  android:contentDescription="Menu"
+                  android:src="@drawable/ic_menu" />
+
+              <ImageView
+                  android:id="@+id/cupImage"
+                  android:layout_width="48dp"
+                  android:layout_height="48dp"
+                  android:background="@null"
+                  android:contentDescription="Menu"
+                  android:padding="10dp"
+                  android:scaleType="centerInside"
+                  android:src="@drawable/cup" />
+
+
+              <TextView
+                  android:id="@+id/textView_streak_count"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_centerVertical="true"
+                  android:layout_marginStart="8dp"
+                  android:text="470"
+                  android:textColor="#000000"
+                  android:textSize="18sp"
+                  android:textStyle="bold" />
+
+              <ImageView
+                  android:layout_width="20dp"
+                  android:layout_height="20dp"
+                  android:layout_centerVertical="true"
+                  android:layout_marginStart="10dp"
+                  android:contentDescription="Coins"
+                  android:src="@drawable/ic_coin" />
+
+              <Space
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1" />
+
+              <androidx.cardview.widget.CardView
+                  android:layout_width="70dp"
+                  android:layout_height="70dp"
+                  android:layout_marginEnd="10dp"
+                  app:cardCornerRadius="35dp"
+                  app:cardElevation="2dp"
+                  android:clipChildren="false"
+                  android:clipToPadding="false">
+
+                  <ImageView
+                      android:id="@+id/profileImage"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:contentDescription="Profile"
+                      android:scaleType="centerCrop"
+                      android:src="@drawable/profile_pic" />
+              </androidx.cardview.widget.CardView>
+
+          </LinearLayout>
+
+          <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_alignParentStart="true"
+             android:background="@drawable/group11"
+             android:orientation="horizontal"
+             android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:layout_marginTop="25dp"
+                   android:padding="10dp"
+                   android:text="Hello,"
+                   android:textColor="#000000"
+                   android:textSize="20sp"
+                   android:textStyle="bold" />
+
+               <TextView
+                   android:id="@+id/textView_user_name"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="10dp"
+                   android:padding="10dp"
+                   android:text="User Name"
+                   android:textColor="#000000"
+                   android:textSize="24sp"
+                   android:textStyle="bold" />
+
+            </LinearLayout>
+
+         </RelativeLayout>
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="150dp"
+             android:background="@drawable/yellow_card_background"
+             android:gravity="center"
+             android:orientation="vertical"
+             android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/proteststrike_regular"
+                android:text="Your Progress for today"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/progressBar_habit"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:progress="24"  android:progressBackgroundTint="@color/black"
+                android:progressDrawable="@drawable/custom_progress_bar" />
+         </LinearLayout>
+
+<!--          //habit streak-->
+
+         <LinearLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginHorizontal="8dp"
+             android:layout_marginTop="16dp"
+             android:background="@drawable/simple_card_background"
+             android:elevation="8dp"
+             android:orientation="vertical"
+             android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Habit Streak"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+               <TextView
+                   android:id="@+id/textView_days_count"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentStart="true"
+                   android:layout_marginStart="14dp"
+                   android:layout_marginTop="10dp"
+                   android:text="0"
+                   android:textColor="#000000"
+                   android:textSize="50sp"
+                   android:textStyle="bold" />
+
+               <LinearLayout
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentEnd="true"
+                   android:layout_centerVertical="true"
+                   android:orientation="vertical">
+
+                  <ImageView
+                      android:id="@+id/fire_icon_streak"
+                      android:layout_width="75dp"
+                      android:layout_height="73dp"
+                      android:contentDescription="Streak fire"
+                      android:src="@drawable/ic_fire" />
+
+                  <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center"
+                      android:layout_marginEnd="4dp"
+                      android:text="Streak"
+                      android:textColor="#000000"
+                      android:textSize="20sp"
+                      android:textStyle="bold" />
+
+               </LinearLayout>
+            </RelativeLayout>
+
+         </LinearLayout>
+
+         <include
+             layout="@layout/streak"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="16dp" />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/calenderView"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             tools:itemCount="1"
+             app:spanCount="2"
+             tools:listitem="@layout/streak"
+             android:layout_marginStart="15dp"
+             android:layout_marginEnd="15dp"/>
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/monthCalenderRecyclerview"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="horizontal"
+             tools:itemCount="1"
+             app:spanCount="2"
+             tools:listitem="@layout/streak"
+             android:layout_marginStart="15dp"
+             android:layout_marginEnd="15dp"/>
+             
+         <!-- MyDayMap component for displaying tasks in the home screen -->
+         <include
+             android:id="@+id/myDayMapLayout"
+             layout="@layout/layout_my_day_map"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="16dp" />
+
+         <!-- Habits Section -->
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginHorizontal="8dp"
+              android:layout_marginTop="16dp"
+              android:layout_marginBottom="80dp"
+              android:background="@drawable/simple_card_background"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="20dp">
+
+              <!-- Header for habits list -->
+              <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginBottom="16dp"
+                  android:text="Your Habits for Today"
+                  android:textColor="#333333"
+                  android:textSize="22sp"
+                  android:textStyle="bold" />
+
+              <androidx.recyclerview.widget.RecyclerView
+                  android:id="@+id/habit_recycler_view"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="8dp"
+                  android:background="@drawable/recyclerview_background"
+                  android:clipToPadding="false"
+                  android:nestedScrollingEnabled="false"
+                  android:padding="8dp" />
+
+              <!-- Empty state for habits -->
+              <LinearLayout
+                  android:id="@+id/habit_empty_state"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_margin="8dp"
+                  android:background="@drawable/enhanced_empty_state_background"
+                  android:gravity="center"
+                  android:orientation="vertical"
+                  android:padding="24dp"
+                  android:visibility="gone">
+
+                  <ImageView
+                      android:layout_width="64dp"
+                      android:layout_height="64dp"
+                      android:layout_marginBottom="12dp"
+                      android:alpha="0.5"
+                      android:src="@drawable/ic_fire" />
+
+                  <TextView
+                      android:id="@+id/empty_habits_text"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="No Habits for Today"
+                      android:textColor="@color/black"
+                      android:textSize="18sp"
+                      android:textStyle="bold" />
+
+                  <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="8dp"
+                      android:text="Add a habit to start building your routine"
+                      android:textColor="#666666"
+                      android:textSize="14sp" />
+              </LinearLayout>
+          </LinearLayout>
+
+      </LinearLayout>
+
+   </ScrollView>
+   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+   <!-- Empty state container to show when there are no tasks -->
+   <LinearLayout
+       android:id="@+id/empty_state_container"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_centerInParent="true"
+       android:orientation="vertical"
+       android:gravity="center"
+       android:visibility="gone">
+       
+       <ImageView
+           android:layout_width="120dp"
+           android:layout_height="120dp"
+           android:src="@drawable/ic_task"
+           android:contentDescription="No tasks available" />
+           
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="16dp"
+           android:text="No tasks for today"
+           android:textSize="18sp"
+           android:textStyle="bold" />
+           
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="8dp"
+           android:text="Add a new task to get started"
+           android:textSize="14sp" />
+   </LinearLayout>
+
+   <RelativeLayout
+       android:layout_width="wrap_content"
+       android:padding="10dp"
+       android:layout_gravity="end"
+       android:layout_alignParentEnd="true"
+       android:layout_marginBottom="40dp"
+       android:layout_marginEnd="20dp"
+       android:layout_alignParentBottom="true"
+       android:layout_height="wrap_content">
+
+      <ImageButton
+          android:id="@+id/addTaskButton"
+          android:layout_width="48dp"
+          android:layout_height="48dp"
+          android:background="@drawable/circle_black_background"
+          android:src="@drawable/ic_add"
+          app:tint="@color/white" />
+
+   </RelativeLayout>
+
+   <!-- Menu Overlay -->
+   <include
+       android:id="@+id/menu_overlay"
+       layout="@layout/menu_overlay"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentStart="true"
+       android:layout_below="@+id/linearLayout"
+       android:layout_marginStart="8dp"
+       android:layout_marginTop="8dp"
+       android:visibility="gone"
+       android:elevation="16dp" />
+
+   <!-- Add Task Overlay -->
+   <include
+       android:id="@+id/add_task_overlay"
+       layout="@layout/add_task_overlay"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentEnd="true"
+       android:layout_alignParentBottom="true"
+       android:layout_marginEnd="20dp"
+       android:layout_marginBottom="100dp"
+       android:visibility="gone"
+       android:elevation="16dp" />
+
+</RelativeLayout>

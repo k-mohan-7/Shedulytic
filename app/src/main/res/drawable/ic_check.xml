@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    
+    <!-- Outer dark green glow/emission - largest -->
+    <path
+        android:fillColor="#40388E3C"
+        android:pathData="M7,14.17L2.83,10l-2.42,2.41L7,21 23,5l-2.41,-2.41z"/>
+    
+    <!-- Middle dark green glow -->
+    <path
+        android:fillColor="#60388E3C"
+        android:pathData="M8,15.17L3.83,11l-1.92,1.91L8,20 22,6l-1.91,-1.91z"/>
+    
+    <!-- Inner dark green glow -->
+    <path
+        android:fillColor="#80388E3C"
+        android:pathData="M8.5,15.67L4.33,11.5l-1.42,1.41L8.5,19.5 21.5,6.5l-1.41,-1.41z"/>
+    
+    <!-- Main white check icon with dark green stroke -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#2E7D32"
+        android:strokeWidth="1"
+        android:pathData="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41z"/>
+</vector>

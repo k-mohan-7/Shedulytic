@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginTop="12dp"
+    android:background="@drawable/simple_card_background"
+    android:elevation="8dp"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Days of Week Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:layout_marginBottom="8dp">
+
+        <!-- Monday -->
+        <TextView
+            android:id="@+id/weekDayText1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MON"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Tuesday -->
+        <TextView
+            android:id="@+id/weekDayText2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="TUE"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Wednesday -->
+        <TextView
+            android:id="@+id/weekDayText3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="WED"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Thursday -->
+        <TextView
+            android:id="@+id/weekDayText4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="THU"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Friday -->
+        <TextView
+            android:id="@+id/weekDayText5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="FRI"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Saturday -->
+        <TextView
+            android:id="@+id/weekDayText6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SAT"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/grey" />
+
+        <!-- Sunday -->
+        <TextView
+            android:id="@+id/weekDayText7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SUN"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/sunday_text" />
+    </LinearLayout>
+
+    <!-- Dates Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:layout_marginBottom="16dp">
+
+        <!-- Date 1 -->
+        <TextView
+            android:id="@+id/dayTextView1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 2 -->
+        <TextView
+            android:id="@+id/dayTextView2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 3 -->
+        <TextView
+            android:id="@+id/dayTextView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 4 -->
+        <TextView
+            android:id="@+id/dayTextView4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 5 -->
+        <TextView
+            android:id="@+id/dayTextView5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 6 -->
+        <TextView
+            android:id="@+id/dayTextView6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+
+        <!-- Date 7 -->
+        <TextView
+            android:id="@+id/dayTextView7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/grey"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Fire Icons Container with White Circle Backgrounds -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7">
+
+        <!-- Fire Icon 1 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon1"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 2 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 3 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon3"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 4 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon4"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 5 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon5"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 6 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon6"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+
+        <!-- Fire Icon 7 with Circle -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1">
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_background"
+                android:layout_gravity="center" />
+            <ImageView
+                android:id="@+id/streakFireIcon7"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_fire"
+                android:layout_gravity="center"
+                android:alpha="0.25" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="dark_black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#FFDB00</color>
+    <color name="d_blue">#1E232C</color>
+    <color name="bg">#5D8073</color>
+    <color name="l_blue">#35C2C1</color>
+    <color name="grey">#808080</color>
+    <color name="teal">#008080</color>
+    <color name="red">#FF0000</color>
+    <color name="sunday_text">#FF0000</color>
+    <color name="default_text">#757575</color>
+    <color name="today_text">#000000</color>
+    <color name="darkGreen">#1D5923</color> <!-- Dark Green for Remainder -->
+    <color name="darkRed">#8B0000</color>
+    <color name="darkBlue">#1A3A5E</color> <!-- Dark Blue for Workflow -->
+
+    <color name="yellow_dark">#CC9400</color>
+    <color name="streak_gold">#FFD700</color>
+    <color name="streak_background">#80000000</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="orange">#FFA500</color>
+    <!-- Golden Yellow for Habit -->
+    <color name="light_gray">#D3D3D3</color> <!-- Light Gray -->
+    <!-- Define colorAccent -->
+    <color name="colorAccent">#FF4081</color>
+    <!-- Task type colors -->
+    <color name="workflow_blue">#2196F3</color>
+    <color name="remainder_green">#4CAF50</color>
+    <color name="habit_purple">#9C27B0</color>
+    <!-- Calendar colors -->
+    <color name="calendar_selected_day">#E94B73</color>
+    <color name="calendar_day_background">#33FFFFFF</color>
+    <!-- Streak Colors -->
+    
+    <!-- New Task type colors for updated layout -->
+    <color name="workflow_color">#10375C</color>
+    <color name="workflow_dark_color">#0A2642</color>
+    <color name="remainder_color">#185519</color>
+    <color name="remainder_dark_color">#0F3A10</color>
+    <color name="habit_color">#F4DE00</color>
+    <color name="habit_dark_color">#DBB500</color>
+    <color name="default_task_color">#607D8B</color>
+    <color name="default_task_dark_color">#455A64</color>
+    
+    <!-- Add Task button color -->
+    <color name="add_task_button_bg">#FFF6DC</color>
+    <color name="add_task_button_text">#000000</color>
+    
+    <!-- Map button colors -->
+    <color name="primary_color">#FFDB00</color>
+    <color name="secondary_color">#808080</color>
+    
+    <!-- Missing colors -->
+    <color name="lightGreen">#90EE90</color> <!-- Light green for streak calendar background -->
+    <color name="darkGray">#4D4D4D</color> <!-- Dark gray for text -->
+    
+    <!-- Task status colors -->
+    <color name="completed_task">#4CAF50</color> <!-- Green for completed tasks -->
+    <color name="incomplete_task">#EEEEEE</color> <!-- Light gray for incomplete tasks -->
+    <color name="task_border">#757575</color> <!-- Border color for task indicator -->
+    <color name="task_indicator_circle">#FF0000</color> <!-- Red circle indicator for home fragment -->
+</resources>
