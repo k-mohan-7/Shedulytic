@@ -36,7 +36,7 @@ import java.util.Locale;
  */
 public class VolleyNetworkManager {
     private static final String TAG = "VolleyNetworkManager";
-    private static final String BASE_URL = "http://192.168.53.64/schedlytic/";
+    private static final String BASE_URL = "http://10.34.179.64/schedlytic/";
     private static final String FALLBACK_URL = "http://localhost/schedlytic/";
     private static final String LOCAL_URL = "http://10.0.2.2/schedlytic/";
     

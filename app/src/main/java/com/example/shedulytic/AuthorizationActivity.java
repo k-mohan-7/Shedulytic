@@ -53,7 +53,7 @@ public class AuthorizationActivity extends AppCompatActivity {
         guestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AuthorizationActivity.this, HomepageActivity.class);
+                Intent intent = new Intent(AuthorizationActivity.this, MainNavigationActivity.class);
                 startActivity(intent);
                 //  Do NOT call finish() here
             }

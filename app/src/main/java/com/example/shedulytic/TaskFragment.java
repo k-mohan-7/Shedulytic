@@ -685,4 +685,12 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
         recyclerView.setFocusable(false);
         recyclerView.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }
+
+    /**
+     * Public method to refresh fragment data
+     * Called from MainNavigationActivity when data needs to be updated
+     */
+    public void refreshData() {
+        refreshAllDataFast();
+    }
 }

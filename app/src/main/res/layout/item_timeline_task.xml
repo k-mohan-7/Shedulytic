@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Timeline Task Item - Shows task with time bar -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <!-- Time Column -->
+    <LinearLayout
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/text_start_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            tools:text="8:00" />
+
+        <View
+            android:id="@+id/time_connector"
+            android:layout_width="2dp"
+            android:layout_height="24dp"
+            android:layout_marginVertical="4dp"
+            android:background="@color/divider" />
+
+        <TextView
+            android:id="@+id/text_end_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_hint"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="9:00" />
+
+    </LinearLayout>
+
+    <!-- Task Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/task_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:cardBackgroundColor="@color/workflow_background"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <!-- Type Indicator Bar -->
+            <View
+                android:id="@+id/type_indicator"
+                android:layout_width="4dp"
+                android:layout_height="match_parent"
+                android:background="@color/workflow_primary" />
+
+            <!-- Content -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/text_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        tools:text="Read DSA Chapter 5" />
+
+                    <!-- Type Badge -->
+                    <TextView
+                        android:id="@+id/badge_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/badge_workflow"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        tools:text="WORKFLOW" />
+
+                </LinearLayout>
+
+                <!-- Time Range (for workflow) -->
+                <TextView
+                    android:id="@+id/text_time_range"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:drawableStart="@drawable/ic_time_small"
+                    android:drawablePadding="4dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:text="8:00 AM - 9:00 AM" />
+
+                <!-- Status -->
+                <TextView
+                    android:id="@+id/text_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/status_pending"
+                    android:textSize="11sp"
+                    android:visibility="gone"
+                    tools:text="⏳ Pending" />
+
+            </LinearLayout>
+
+            <!-- Checkbox -->
+            <CheckBox
+                android:id="@+id/checkbox_complete"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:button="@drawable/checkbox_custom" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

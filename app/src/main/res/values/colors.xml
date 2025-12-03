@@ -1,65 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ============================================ -->
+    <!-- SHEDULYTIC - UNIFIED COLOR SCHEME           -->
+    <!-- Clean, consistent colors for better UX      -->
+    <!-- ============================================ -->
+
+    <!-- Base Colors -->
     <color name="black">#FF000000</color>
     <color name="dark_black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+    
+    <!-- Primary Brand Colors -->
     <color name="primary">#FFDB00</color>
-    <color name="d_blue">#1E232C</color>
-    <color name="bg">#5D8073</color>
-    <color name="l_blue">#35C2C1</color>
-    <color name="grey">#808080</color>
-    <color name="teal">#008080</color>
-    <color name="red">#FF0000</color>
-    <color name="sunday_text">#FF0000</color>
+    <color name="primary_dark">#E6C600</color>
+    <color name="primary_light">#FFF176</color>
+    <color name="primary_color">#FFDB00</color>
+    
+    <!-- Accent Colors -->
+    <color name="colorAccent">#FF6B6B</color>
+    <color name="colorAccentDark">#E85555</color>
+    
+    <!-- Background Colors -->
+    <color name="background_primary">#FAFAFA</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="background_card">#FFFFFF</color>
+    <color name="background_dark">#1E1E1E</color>
+    <color name="bg">#F8F9FA</color>
+    
+    <!-- ============================================ -->
+    <!-- TASK TYPE COLORS - CONSISTENT EVERYWHERE    -->
+    <!-- Reminder = Blue, Workflow = Orange, Habit = Green -->
+    <!-- ============================================ -->
+    
+    <!-- Reminder Colors (Blue Theme) -->
+    <color name="reminder_primary">#2196F3</color>
+    <color name="reminder_dark">#1976D2</color>
+    <color name="reminder_light">#BBDEFB</color>
+    <color name="reminder_background">#E3F2FD</color>
+    
+    <!-- Workflow Colors (Orange Theme) -->
+    <color name="workflow_primary">#FF9800</color>
+    <color name="workflow_dark">#F57C00</color>
+    <color name="workflow_light">#FFE0B2</color>
+    <color name="workflow_background">#FFF3E0</color>
+    <color name="workflow_blue">#FF9800</color>
+    <color name="workflow_color">#FF9800</color>
+    <color name="workflow_dark_color">#F57C00</color>
+    
+    <!-- Habit Colors (Green Theme) -->
+    <color name="habit_primary">#4CAF50</color>
+    <color name="habit_dark">#388E3C</color>
+    <color name="habit_light">#C8E6C9</color>
+    <color name="habit_background">#E8F5E9</color>
+    <color name="habit_purple">#4CAF50</color>
+    <color name="habit_color">#4CAF50</color>
+    <color name="habit_dark_color">#388E3C</color>
+    
+    <!-- Legacy compatibility - Remainder = Reminder -->
+    <color name="remainder_green">#2196F3</color>
+    <color name="remainder_color">#2196F3</color>
+    <color name="remainder_dark_color">#1976D2</color>
+    
+    <!-- ============================================ -->
+    <!-- TEXT COLORS                                  -->
+    <!-- ============================================ -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_disabled">#9E9E9E</color>
+    <color name="text_on_primary">#000000</color>
+    <color name="text_on_dark">#FFFFFF</color>
     <color name="default_text">#757575</color>
     <color name="today_text">#000000</color>
-    <color name="darkGreen">#1D5923</color> <!-- Dark Green for Remainder -->
-    <color name="darkRed">#8B0000</color>
-    <color name="darkBlue">#1A3A5E</color> <!-- Dark Blue for Workflow -->
-
-    <color name="yellow_dark">#CC9400</color>
-    <color name="streak_gold">#FFD700</color>
-    <color name="streak_background">#80000000</color>
-    <color name="yellow">#FFFF00</color>
-    <color name="orange">#FFA500</color>
-    <!-- Golden Yellow for Habit -->
-    <color name="light_gray">#D3D3D3</color> <!-- Light Gray -->
-    <!-- Define colorAccent -->
-    <color name="colorAccent">#FF4081</color>
-    <!-- Task type colors -->
-    <color name="workflow_blue">#2196F3</color>
-    <color name="remainder_green">#4CAF50</color>
-    <color name="habit_purple">#9C27B0</color>
-    <!-- Calendar colors -->
-    <color name="calendar_selected_day">#E94B73</color>
-    <color name="calendar_day_background">#33FFFFFF</color>
-    <!-- Streak Colors -->
     
-    <!-- New Task type colors for updated layout -->
-    <color name="workflow_color">#10375C</color>
-    <color name="workflow_dark_color">#0A2642</color>
-    <color name="remainder_color">#185519</color>
-    <color name="remainder_dark_color">#0F3A10</color>
-    <color name="habit_color">#F4DE00</color>
-    <color name="habit_dark_color">#DBB500</color>
+    <!-- ============================================ -->
+    <!-- STATUS COLORS                                -->
+    <!-- ============================================ -->
+    <color name="status_pending">#FFC107</color>
+    <color name="status_active">#2196F3</color>
+    <color name="status_completed">#4CAF50</color>
+    <color name="status_skipped">#9E9E9E</color>
+    <color name="status_cancelled">#F44336</color>
+    <color name="status_extended">#FF9800</color>
+    
+    <!-- Legacy status colors -->
+    <color name="completed_task">#4CAF50</color>
+    <color name="incomplete_task">#EEEEEE</color>
+    <color name="task_border">#E0E0E0</color>
+    <color name="task_indicator_circle">#FF6B6B</color>
+    
+    <!-- ============================================ -->
+    <!-- NAVIGATION & UI COLORS                       -->
+    <!-- ============================================ -->
+    <color name="nav_active">#FFDB00</color>
+    <color name="nav_inactive">#9E9E9E</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="ripple">#1F000000</color>
+    
+    <!-- Tab colors -->
+    <color name="d_blue">#1E232C</color>
+    <color name="l_blue">#2196F3</color>
+    
+    <!-- ============================================ -->
+    <!-- STREAK & GAMIFICATION                        -->
+    <!-- ============================================ -->
+    <color name="streak_fire">#FF6B35</color>
+    <color name="streak_gold">#FFD700</color>
+    <color name="streak_background">#FFF8E1</color>
+    <color name="xp_gold">#FFD700</color>
+    <color name="level_badge">#9C27B0</color>
+    
+    <!-- ============================================ -->
+    <!-- CALENDAR COLORS                              -->
+    <!-- ============================================ -->
+    <color name="calendar_today">#FFDB00</color>
+    <color name="calendar_selected_day">#FF6B6B</color>
+    <color name="calendar_day_background">#F5F5F5</color>
+    <color name="calendar_streak_day">#C8E6C9</color>
+    <color name="sunday_text">#F44336</color>
+    
+    <!-- ============================================ -->
+    <!-- FAB & BUTTON COLORS                          -->
+    <!-- ============================================ -->
+    <color name="fab_background">#212121</color>
+    <color name="fab_icon">#FFFFFF</color>
+    <color name="button_primary">#FFDB00</color>
+    <color name="button_secondary">#E0E0E0</color>
+    <color name="add_task_button_bg">#212121</color>
+    <color name="add_task_button_text">#FFFFFF</color>
+    
+    <!-- ============================================ -->
+    <!-- MISC COLORS                                  -->
+    <!-- ============================================ -->
+    <color name="grey">#808080</color>
+    <color name="teal">#008080</color>
+    <color name="red">#F44336</color>
+    <color name="orange">#FF9800</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="yellow_dark">#FBC02D</color>
+    <color name="darkGreen">#388E3C</color>
+    <color name="lightGreen">#C8E6C9</color>
+    <color name="darkRed">#C62828</color>
+    <color name="darkBlue">#1565C0</color>
+    <color name="darkGray">#424242</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="secondary_color">#757575</color>
+    
+    <!-- Default task colors -->
     <color name="default_task_color">#607D8B</color>
     <color name="default_task_dark_color">#455A64</color>
     
-    <!-- Add Task button color -->
-    <color name="add_task_button_bg">#FFF6DC</color>
-    <color name="add_task_button_text">#000000</color>
+    <!-- ============================================ -->
+    <!-- BOTTOM SHEET COLORS                          -->
+    <!-- ============================================ -->
+    <color name="bottom_sheet_background">#FFFFFF</color>
+    <color name="bottom_sheet_handle">#E0E0E0</color>
+    <color name="sheet_reminder_bg">#E3F2FD</color>
+    <color name="sheet_workflow_bg">#FFF3E0</color>
+    <color name="sheet_habit_bg">#E8F5E9</color>
     
-    <!-- Map button colors -->
-    <color name="primary_color">#FFDB00</color>
-    <color name="secondary_color">#808080</color>
-    
-    <!-- Missing colors -->
-    <color name="lightGreen">#90EE90</color> <!-- Light green for streak calendar background -->
-    <color name="darkGray">#4D4D4D</color> <!-- Dark gray for text -->
-    
-    <!-- Task status colors -->
-    <color name="completed_task">#4CAF50</color> <!-- Green for completed tasks -->
-    <color name="incomplete_task">#EEEEEE</color> <!-- Light gray for incomplete tasks -->
-    <color name="task_border">#757575</color> <!-- Border color for task indicator -->
-    <color name="task_indicator_circle">#FF0000</color> <!-- Red circle indicator for home fragment -->
+    <!-- ============================================ -->
+    <!-- ADDITIONAL UI COLORS                         -->
+    <!-- ============================================ -->
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="background_light">#FAFAFA</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="error">#F44336</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
 </resources>

@@ -82,4 +82,12 @@ public class ProfileFragment extends Fragment {
             Log.e(TAG, "Error optimizing view performance: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Public method to refresh fragment data
+     * Called from MainNavigationActivity when data needs to be updated
+     */
+    public void refreshData() {
+        loadUserData();
+    }
 }

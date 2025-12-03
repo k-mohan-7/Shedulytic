@@ -82,7 +82,10 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
     private TextView userNameTextView;
     private TextView streakCountTextView; // This is textView_days_count from XML
     private ImageView fireIconStreakImageView; // Added for the fire icon
-    // private TextView topStreakCoinTextView; // TODO: If you want to update R.id.textView_streak_count
+    private TextView topStreakCountTextView; // For top bar streak chip
+    private TextView xpCountTextView; // For XP/coins display
+    private TextView currentDayTextView; // For header day display
+    private TextView currentDateTextView; // For header date display
     private ImageView profileImageView;
     private SwipeRefreshLayout swipeRefresh; // Added for explicit null check
     private String userId;
@@ -203,75 +206,39 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_new, container, false);
 
         // requestQueue = Volley.newRequestQueue(requireContext()); // If making direct Volley calls
 
-        // Initialize MyDayMap component
-        View myDayMapLayout = view.findViewById(R.id.myDayMapLayout);
-        if (myDayMapLayout != null) {
-            myDayRecyclerView = myDayMapLayout.findViewById(R.id.myDayRecyclerView);
-            myDayEmptyState = myDayMapLayout.findViewById(R.id.myDayEmptyState);
+        // Initialize Timeline RecyclerView (replaces MyDayMap in new layout)
+        RecyclerView timelineRecycler = view.findViewById(R.id.recycler_timeline);
+        View emptyTimeline = view.findViewById(R.id.empty_timeline);
+        
+        if (timelineRecycler != null) {
+            LinearLayoutManager timelineLayoutManager = new LinearLayoutManager(getContext());
+            timelineRecycler.setLayoutManager(timelineLayoutManager);
+            timelineRecycler.setNestedScrollingEnabled(false);
+            timelineRecycler.setHasFixedSize(true);
+            myDayTimelineRecycler = timelineRecycler; // Reuse existing field
             
-            // Initialize timeline in MyDayMap
-            View timelineContainer = myDayMapLayout.findViewById(R.id.timeline_container);
-            if (timelineContainer != null) {
-                myDayTimelineRecycler = timelineContainer.findViewById(R.id.timelineRecyclerView);
-                myDayTimelineEmptyText = timelineContainer.findViewById(R.id.timeline_empty_state_text);
-                View myDayTimelineEmptyState = timelineContainer.findViewById(R.id.timeline_empty_state);
-                
-                if (myDayTimelineRecycler != null) {
-                    // Set LayoutManager with advanced optimizations for better performance
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-                    
-                    // Advanced performance optimizations for nested scrolling
-                    myDayTimelineRecycler.setHasFixedSize(true);
-                    myDayTimelineRecycler.setItemViewCacheSize(20);
-                    myDayTimelineRecycler.setDrawingCacheEnabled(true);
-                    myDayTimelineRecycler.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                    
-                    // Critical: Disable nested scrolling for better performance in ScrollView
-                    myDayTimelineRecycler.setNestedScrollingEnabled(false);
-                    
-                    // Additional scroll optimizations
-                    myDayTimelineRecycler.setVerticalScrollBarEnabled(false);
-                    myDayTimelineRecycler.setOverScrollMode(View.OVER_SCROLL_NEVER);
-                    
-                    // Enable view recycling optimizations
-                    layoutManager.setItemPrefetchEnabled(true);
-                    layoutManager.setInitialPrefetchItemCount(4);
-                    
-                    myDayTimelineRecycler.setLayoutManager(layoutManager);
-                }
-            }
-            
-            if (myDayRecyclerView != null) {
-                LinearLayoutManager myDayLayoutManager = new LinearLayoutManager(getContext());
-                myDayRecyclerView.setLayoutManager(myDayLayoutManager);
-                
-                // Apply performance optimizations for MyDay RecyclerView
-                myDayRecyclerView.setHasFixedSize(true);
-                myDayRecyclerView.setItemViewCacheSize(15);
-                myDayRecyclerView.setNestedScrollingEnabled(false);
-                myDayRecyclerView.setVerticalScrollBarEnabled(false);
-                myDayRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-                
-                // Enable view recycling optimizations
-                myDayLayoutManager.setItemPrefetchEnabled(true);
-                myDayLayoutManager.setInitialPrefetchItemCount(3);
-                
-                // Initialize with empty list - will be populated later
-                myDayRecyclerView.setAdapter(new MyDayMapAdapter(new ArrayList<>(), requireContext(), 
-                    task -> Log.d(TAG, "Task clicked: " + task.getTitle())));
-            }
+            // Apply performance optimizations for timeline RecyclerView
+            myDayTimelineRecycler.setItemViewCacheSize(20);
+            myDayTimelineRecycler.setVerticalScrollBarEnabled(false);
+            myDayTimelineRecycler.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
 
         userNameTextView = view.findViewById(R.id.textView_user_name);
         streakCountTextView = view.findViewById(R.id.textView_days_count); // Main streak display
         fireIconStreakImageView = view.findViewById(R.id.fire_icon_streak); // Initialize here
-        // topStreakCoinTextView = view.findViewById(R.id.textView_streak_count); // For top bar coin/XP
+        topStreakCountTextView = view.findViewById(R.id.text_streak_count); // Top bar streak chip
+        xpCountTextView = view.findViewById(R.id.text_xp_count); // XP/coins display
+        currentDayTextView = view.findViewById(R.id.text_current_day); // Header day
+        currentDateTextView = view.findViewById(R.id.text_current_date); // Header date
         profileImageView = view.findViewById(R.id.profileImage);
         swipeRefresh = view.findViewById(R.id.swipeRefresh); // Initialize swipeRefresh
+        
+        // Update header with current date
+        updateHeaderDate();
         
         // Initialize menu components
         setupMenuComponents(view);
@@ -315,12 +282,14 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         userId = prefs.getString("user_id", null);
         username = prefs.getString("username", "User (Default)"); // Provide a default
         int currentStreak = prefs.getInt("streak_count", 0);
+        int xpCoins = prefs.getInt("xp_coins", 0);
 
         Log.i(TAG, "User ID from Prefs: " + userId + ", Username: " + username + ", Initial Streak: " + currentStreak);
 
-        if (userNameTextView != null) userNameTextView.setText(username);
+        if (userNameTextView != null) userNameTextView.setText(username + " 👋");
         if (streakCountTextView != null) streakCountTextView.setText(String.valueOf(currentStreak));
-        // if (topStreakCoinTextView != null) topStreakCoinTextView.setText("0"); // Init XP/Coin display
+        if (topStreakCountTextView != null) topStreakCountTextView.setText(String.valueOf(currentStreak));
+        if (xpCountTextView != null) xpCountTextView.setText(String.valueOf(xpCoins));
 
 
         if (userId == null || userId.isEmpty()) {
@@ -750,8 +719,7 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                     Log.e(TAG, "streakCountTextView is null, cannot update streak count UI");
                 }
                 
-                // Also update the top streak count if available
-                TextView topStreakCountTextView = getView() != null ? getView().findViewById(R.id.textView_streak_count) : null;
+                // Also update the top streak count chip if available (new layout uses text_streak_count)
                 if (topStreakCountTextView != null) {
                     topStreakCountTextView.setText(String.valueOf(count));
                     Log.d(TAG, "Updated top streak count UI to: " + count);
@@ -770,32 +738,36 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
     }
 
     private void initializeCalendarViews(View view) {
+        // Find the week calendar container (may be an include or direct)
+        View weekCalendar = view.findViewById(R.id.week_calendar);
+        View calendarRoot = weekCalendar != null ? weekCalendar : view;
+        
         // Day of week TextViews
-        weekDayTexts[0] = view.findViewById(R.id.weekDayText1);
-        weekDayTexts[1] = view.findViewById(R.id.weekDayText2);
-        weekDayTexts[2] = view.findViewById(R.id.weekDayText3);
-        weekDayTexts[3] = view.findViewById(R.id.weekDayText4);
-        weekDayTexts[4] = view.findViewById(R.id.weekDayText5);
-        weekDayTexts[5] = view.findViewById(R.id.weekDayText6);
-        weekDayTexts[6] = view.findViewById(R.id.weekDayText7);
+        weekDayTexts[0] = calendarRoot.findViewById(R.id.weekDayText1);
+        weekDayTexts[1] = calendarRoot.findViewById(R.id.weekDayText2);
+        weekDayTexts[2] = calendarRoot.findViewById(R.id.weekDayText3);
+        weekDayTexts[3] = calendarRoot.findViewById(R.id.weekDayText4);
+        weekDayTexts[4] = calendarRoot.findViewById(R.id.weekDayText5);
+        weekDayTexts[5] = calendarRoot.findViewById(R.id.weekDayText6);
+        weekDayTexts[6] = calendarRoot.findViewById(R.id.weekDayText7);
 
         // Day number TextViews
-        dayTextViews[0] = view.findViewById(R.id.dayTextView1);
-        dayTextViews[1] = view.findViewById(R.id.dayTextView2);
-        dayTextViews[2] = view.findViewById(R.id.dayTextView3);
-        dayTextViews[3] = view.findViewById(R.id.dayTextView4);
-        dayTextViews[4] = view.findViewById(R.id.dayTextView5);
-        dayTextViews[5] = view.findViewById(R.id.dayTextView6);
-        dayTextViews[6] = view.findViewById(R.id.dayTextView7);
+        dayTextViews[0] = calendarRoot.findViewById(R.id.dayTextView1);
+        dayTextViews[1] = calendarRoot.findViewById(R.id.dayTextView2);
+        dayTextViews[2] = calendarRoot.findViewById(R.id.dayTextView3);
+        dayTextViews[3] = calendarRoot.findViewById(R.id.dayTextView4);
+        dayTextViews[4] = calendarRoot.findViewById(R.id.dayTextView5);
+        dayTextViews[5] = calendarRoot.findViewById(R.id.dayTextView6);
+        dayTextViews[6] = calendarRoot.findViewById(R.id.dayTextView7);
 
         // Streak fire ImageView
-        streakImageViews[0] = view.findViewById(R.id.streakFireIcon1);
-        streakImageViews[1] = view.findViewById(R.id.streakFireIcon2);
-        streakImageViews[2] = view.findViewById(R.id.streakFireIcon3);
-        streakImageViews[3] = view.findViewById(R.id.streakFireIcon4);
-        streakImageViews[4] = view.findViewById(R.id.streakFireIcon5);
-        streakImageViews[5] = view.findViewById(R.id.streakFireIcon6);
-        streakImageViews[6] = view.findViewById(R.id.streakFireIcon7);
+        streakImageViews[0] = calendarRoot.findViewById(R.id.streakFireIcon1);
+        streakImageViews[1] = calendarRoot.findViewById(R.id.streakFireIcon2);
+        streakImageViews[2] = calendarRoot.findViewById(R.id.streakFireIcon3);
+        streakImageViews[3] = calendarRoot.findViewById(R.id.streakFireIcon4);
+        streakImageViews[4] = calendarRoot.findViewById(R.id.streakFireIcon5);
+        streakImageViews[5] = calendarRoot.findViewById(R.id.streakFireIcon6);
+        streakImageViews[6] = calendarRoot.findViewById(R.id.streakFireIcon7);
 
         // Check if all views were found (basic sanity check)
         for(int i=0; i<7; i++) {
@@ -936,10 +908,10 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                 }
             }
             
-            // Always ensure the main empty state container is hidden
-            View emptyStateView = getView() != null ? getView().findViewById(R.id.empty_state_container) : null;
-            if (emptyStateView != null) {
-                emptyStateView.setVisibility(View.GONE);
+            // Hide the empty timeline state in new layout
+            View emptyTimeline = getView() != null ? getView().findViewById(R.id.empty_timeline) : null;
+            if (emptyTimeline != null) {
+                emptyTimeline.setVisibility(View.GONE);
             }
             
             // Force a layout pass to ensure the RecyclerView updates
@@ -1017,20 +989,27 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
             }
         }
         
-        // Don't show the main empty state container that covers the entire screen
-        View emptyStateView = getView() != null ? getView().findViewById(R.id.empty_state_container) : null;
-        if (emptyStateView != null) {
-            emptyStateView.setVisibility(View.GONE);
+        // Show empty timeline state in new layout
+        View emptyTimeline = getView() != null ? getView().findViewById(R.id.empty_timeline) : null;
+        if (emptyTimeline != null && todayActivities.isEmpty()) {
+            emptyTimeline.setVisibility(View.VISIBLE);
         }
     }
 
     // Helper method to find the timeline empty state container
     private View findTimelineEmptyStateContainer() {
-        View myDayMapLayout = getView() != null ? getView().findViewById(R.id.myDayMapLayout) : null;
+        // For new layout, use empty_timeline directly
+        View emptyTimeline = getView() != null ? getView().findViewById(R.id.empty_timeline) : null;
+        if (emptyTimeline != null) {
+            return emptyTimeline;
+        }
+        
+        // Fallback for old layout with myDayMapLayout
+        View myDayMapLayout = getView() != null ? getView().findViewById(R.id.card_timeline) : null;
         if (myDayMapLayout != null) {
-            View timelineContainer = myDayMapLayout.findViewById(R.id.timeline_container);
+            View timelineContainer = myDayMapLayout.findViewById(R.id.empty_timeline);
             if (timelineContainer != null) {
-                return timelineContainer.findViewById(R.id.timeline_empty_state);
+                return timelineContainer;
             }
         }
         return null;
@@ -1644,12 +1623,12 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         }
         
         // Optimize all RecyclerViews to work better within ScrollView
-        optimizeRecyclerViewInScrollView(getView().findViewById(R.id.calenderView), 7);
-        optimizeRecyclerViewInScrollView(getView().findViewById(R.id.monthCalenderRecyclerview), 31);
+        // These RecyclerViews may not exist in new layout - check for null
+        RecyclerView timelineRecycler = getView().findViewById(R.id.recycler_timeline);
+        optimizeRecyclerViewInScrollView(timelineRecycler, 10);
         optimizeRecyclerViewInScrollView(habitRecyclerView, 10);
         
-        // Optimize MyDayMap RecyclerViews
-        optimizeRecyclerViewInScrollView(myDayRecyclerView, 15);
+        // Optimize timeline RecyclerView
         optimizeRecyclerViewInScrollView(myDayTimelineRecycler, 20);
         
         Log.d(TAG, "Scrolling performance optimizations applied successfully");
@@ -1781,6 +1760,28 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         
         // Apply scroll optimizations to fix nested RecyclerView conflicts
         optimizeScrollingPerformance();
+    }
+
+    /**
+     * Updates the header with current day and date
+     */
+    private void updateHeaderDate() {
+        Calendar calendar = Calendar.getInstance();
+        
+        // Format: "Tuesday"
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        String dayOfWeek = dayFormat.format(calendar.getTime());
+        
+        // Format: "December 2, 2025"
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+        String fullDate = dateFormat.format(calendar.getTime());
+        
+        if (currentDayTextView != null) {
+            currentDayTextView.setText(dayOfWeek);
+        }
+        if (currentDateTextView != null) {
+            currentDateTextView.setText(fullDate);
+        }
     }
 
     /**
@@ -1975,78 +1976,34 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
     }
     
     /**
-     * Sets up add task overlay components including add button and overlay
+     * Sets up add task overlay components - Now handled by MainNavigationActivity FAB
+     * This method is kept for backward compatibility but does nothing
      */
     private void setupAddTaskOverlay(View view) {
-        ImageButton addTaskButton = view.findViewById(R.id.addTaskButton);
-        View addTaskOverlay = view.findViewById(R.id.add_task_overlay);
-        
-        if (addTaskButton != null && addTaskOverlay != null) {
-            // Set add task button click listener
-            addTaskButton.setOnClickListener(v -> {
-                if (addTaskOverlay.getVisibility() == View.GONE) {
-                    addTaskOverlay.setVisibility(View.VISIBLE);
-                } else {
-                    addTaskOverlay.setVisibility(View.GONE);
-                }
-            });
-            
-            // Setup add task overlay item click listeners
-            setupAddTaskOverlayListeners(addTaskOverlay);
-            
-            // Hide overlay when clicking outside (on the main view)
-            view.setOnClickListener(v -> {
-                if (addTaskOverlay.getVisibility() == View.VISIBLE) {
-                    addTaskOverlay.setVisibility(View.GONE);
-                }
-            });
-        }
+        // Add task button and overlay removed - using unified FAB in MainNavigationActivity
+        // The FAB bottom sheet in MainNavigationActivity now handles all add task/habit functionality
     }
     
     /**
-     * Sets up click listeners for add task overlay items
+     * Sets up click listeners for add task overlay items - No longer used
+     * Functionality moved to MainNavigationActivity bottom sheet
      */
     private void setupAddTaskOverlayListeners(View addTaskOverlay) {
-        // Add Workflow button
-        View addWorkflowButton = addTaskOverlay.findViewById(R.id.add_workflow_button);
-        if (addWorkflowButton != null) {
-            addWorkflowButton.setOnClickListener(v -> {
-                hideAddTaskOverlay(addTaskOverlay);
-                Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-                intent.putExtra("task_type", "workflow");
-                startActivity(intent);
-            });
-        }
-        
-        // Add Reminder button
-        View addReminderButton = addTaskOverlay.findViewById(R.id.add_reminder_button);
-        if (addReminderButton != null) {
-            addReminderButton.setOnClickListener(v -> {
-                hideAddTaskOverlay(addTaskOverlay);
-                Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-                intent.putExtra("task_type", "remainder");
-                startActivity(intent);
-            });
-        }
-        
-        // Add Habit button
-        View addHabitButton = addTaskOverlay.findViewById(R.id.add_habit_button);
-        if (addHabitButton != null) {
-            addHabitButton.setOnClickListener(v -> {
-                hideAddTaskOverlay(addTaskOverlay);
-                Intent intent = new Intent(getActivity(), AddTaskActivity.class);
-                intent.putExtra("task_type", "habit");
-                startActivity(intent);
-            });
-        }
+        // This functionality is now in MainNavigationActivity bottom sheet
     }
     
     /**
-     * Hides the add task overlay
+     * Hides the add task overlay - No longer used
      */
     private void hideAddTaskOverlay(View addTaskOverlay) {
-        if (addTaskOverlay != null) {
-            addTaskOverlay.setVisibility(View.GONE);
-        }
+        // No longer used - handled by MainNavigationActivity
+    }
+
+    /**
+     * Public method to refresh fragment data
+     * Called from MainNavigationActivity when data needs to be updated
+     */
+    public void refreshData() {
+        refreshAllData(true);
     }
 }

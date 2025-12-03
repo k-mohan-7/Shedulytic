@@ -90,7 +90,7 @@ public class NetworkUtils {
         
         // Try all possible URLs to ensure we can connect to at least one
         String[] urlsToTry = {
-            "http://192.168.53.64/schedlytic/",
+            "http://10.34.179.64/schedlytic/",
             "http://localhost/schedlytic/",
             "http://10.0.2.2/schedlytic/"
         };

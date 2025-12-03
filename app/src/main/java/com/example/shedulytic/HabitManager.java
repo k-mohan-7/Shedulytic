@@ -333,10 +333,11 @@ public class HabitManager {
                 // This is a placeholder for the actual implementation
                 Log.d(TAG, "Marking day with fire icon: " + dateStr);
                 
-                // Find calendar view and update it
-                View calendarView = activity.findViewById(R.id.monthCalenderRecyclerview);
-                if (calendarView != null && calendarView instanceof CalendarViewWithFireIcons) {
-                    ((CalendarViewWithFireIcons) calendarView).markDateWithFireIcon(dateStr);
+                // Find week calendar view from included layout
+                View weekCalendar = activity.findViewById(R.id.week_calendar);
+                if (weekCalendar != null) {
+                    // Calendar fire icons are now handled via layout_week_calendar.xml
+                    Log.d(TAG, "Week calendar found, fire icons handled by HomeFragment");
                 }
             });
         } catch (Exception e) {

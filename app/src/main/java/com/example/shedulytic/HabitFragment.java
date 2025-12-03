@@ -1190,4 +1190,11 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
         });
     }
 
+    /**
+     * Public method to refresh fragment data
+     * Called from MainNavigationActivity when data needs to be updated
+     */
+    public void refreshData() {
+        refreshAllDataFast();
+    }
 }

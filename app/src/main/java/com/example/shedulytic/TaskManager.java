@@ -798,7 +798,7 @@ public class TaskManager {
     private void tryUpdateTaskTimeWithDirectIp(String taskId, String startTime, String endTime, String previousError) {
         try {
             String[] ipUrls = {
-                "http://192.168.53.64/schedlytic/update_task.php",
+                "http://10.34.179.64/schedlytic/update_task.php",
                 "http://10.0.2.2/schedlytic/update_task.php"
             };
             
@@ -1140,7 +1140,7 @@ public class TaskManager {
     private void tryAddTaskWithDirectIp(Task task, String previousError) {
         try {            // Get direct IP addresses to try
             String[] ipAddresses = {
-                "http://192.168.53.64/schedlytic/add_task.php",
+                "http://10.34.179.64/schedlytic/add_task.php",
                 "http://10.0.2.2/schedlytic/add_task.php"
             };
             

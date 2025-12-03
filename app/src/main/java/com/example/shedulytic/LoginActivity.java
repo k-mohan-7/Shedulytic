@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 // Try multiple server URLs in sequence
                 String[] serverUrls = {
-                    "http://192.168.53.64/schedlytic/",
+                    "http://10.34.179.64/schedlytic/",
                     "http://10.0.2.2/schedlytic/",
                     "http://10.0.2.2:80/schedlytic/",
                     "http://127.0.0.1/schedlytic/",
@@ -166,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.commit();
 
                                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(LoginActivity.this, HomepageActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, MainNavigationActivity.class);
                                 intent.putExtra("user_id", userId);
                                 intent.putExtra("username", username);
                                 intent.putExtra("xp_points", xpPoints);

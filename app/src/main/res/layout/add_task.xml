@@ -49,11 +49,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@android:color/white"
+            android:background="@drawable/calendar_container_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:elevation="2dp">
 
             <!-- Calendar Header -->
             <LinearLayout
@@ -61,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:id="@+id/calendar_month_year"
@@ -72,6 +73,77 @@
                     android:textColor="#1A1A1A"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+            </LinearLayout>
+            
+            <!-- Day Labels Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sun"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Mon"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Tue"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Wed"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Thu"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fri"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+                    
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sat"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:gravity="center" />
             </LinearLayout>
 
             <!-- Calendar Grid -->
@@ -137,10 +209,12 @@
             android:id="@+id/task_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:padding="12dp"
+            android:background="@drawable/input_field_background"
+            android:padding="14dp"
             android:hint="Enter task title"
-            android:minHeight="50dp"
+            android:textColorHint="#9E9E9E"
+            android:textColor="#1A1A1A"
+            android:minHeight="52dp"
             android:layout_marginBottom="16dp" />        <!-- Time Selection Section -->
         <TextView
             android:layout_width="match_parent"
@@ -149,120 +223,168 @@
             android:textColor="#1A1A1A"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center"
             android:layout_marginBottom="16dp">
 
-            <!-- From Time -->
+            <!-- From Time Card -->
             <LinearLayout
+                android:id="@+id/from_time_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginEnd="8dp">
+                android:background="@drawable/time_picker_card_background"
+                android:padding="16dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="From"
+                    android:text="FROM"
                     android:textColor="#666666"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="8dp" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
-                    android:padding="8dp">
+                    android:gravity="center_vertical">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/from_time_hours"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="HH"
-                        android:inputType="number"
-                        android:maxLength="2"
-                        android:gravity="center"
-                        android:background="@null" />
+                        android:text="09"
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=":"
-                        android:textSize="16sp"
-                        android:layout_gravity="center_vertical" />
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/from_time_minutes"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="MM"
-                        android:inputType="number"
-                        android:maxLength="2"
-                        android:gravity="center"
-                        android:background="@null" />
+                        android:text="00"
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/from_time_period"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AM"
+                    android:textColor="@color/darkGreen"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
 
-            <!-- To Time -->
+            <!-- Arrow Icon -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_forward"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="to" />
+
+            <!-- To Time Card -->
             <LinearLayout
+                android:id="@+id/to_time_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:background="@drawable/time_picker_card_background"
+                android:padding="16dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="To"
+                    android:text="TO"
                     android:textColor="#666666"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="8dp" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
-                    android:padding="8dp">
+                    android:gravity="center_vertical">
 
-                    <EditText
+                    <TextView
                         android:id="@+id/to_time_hours"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="HH"
-                        android:inputType="number"
-                        android:maxLength="2"
-                        android:gravity="center"
-                        android:background="@null" />
+                        android:text="10"
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=":"
-                        android:textSize="16sp"
-                        android:layout_gravity="center_vertical" />
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/to_time_minutes"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="MM"
-                        android:inputType="number"
-                        android:maxLength="2"
-                        android:gravity="center"
-                        android:background="@null" />
+                        android:text="00"
+                        android:textColor="#1A1A1A"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/to_time_period"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AM"
+                    android:textColor="@color/darkGreen"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -496,9 +618,11 @@
             android:id="@+id/additional_notes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:padding="12dp"
+            android:background="@drawable/input_field_background"
+            android:padding="14dp"
             android:hint="Enter additional notes"
+            android:textColorHint="#9E9E9E"
+            android:textColor="#1A1A1A"
             android:minHeight="100dp"
             android:gravity="top"
             android:inputType="textMultiLine"

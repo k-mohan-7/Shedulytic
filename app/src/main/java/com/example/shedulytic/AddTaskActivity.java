@@ -20,6 +20,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,8 +32,12 @@ import java.util.Locale;
 public class AddTaskActivity extends AppCompatActivity {
     private TextView fromTimeHours;
     private TextView fromTimeMinutes;
+    private TextView fromTimePeriod;
     private TextView toTimeHours;
     private TextView toTimeMinutes;
+    private TextView toTimePeriod;
+    private LinearLayout fromTimeContainer;
+    private LinearLayout toTimeContainer;
     private EditText taskTitle;
     private EditText additionalNotes;
     private LinearLayout btnWorkflow;
@@ -45,6 +52,12 @@ public class AddTaskActivity extends AppCompatActivity {
     private String selectedTaskType = "remainder"; // Default
     private Calendar calendar;
     private TaskManager taskManager;
+    
+    // Store time in 24-hour format for internal use
+    private int fromHour = 9;
+    private int fromMinute = 0;
+    private int toHour = 10;
+    private int toMinute = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +67,12 @@ public class AddTaskActivity extends AppCompatActivity {
         // Initialize views
         fromTimeHours = findViewById(R.id.from_time_hours);
         fromTimeMinutes = findViewById(R.id.from_time_minutes);
+        fromTimePeriod = findViewById(R.id.from_time_period);
         toTimeHours = findViewById(R.id.to_time_hours);
         toTimeMinutes = findViewById(R.id.to_time_minutes);
+        toTimePeriod = findViewById(R.id.to_time_period);
+        fromTimeContainer = findViewById(R.id.from_time_container);
+        toTimeContainer = findViewById(R.id.to_time_container);
         taskTitle = findViewById(R.id.task_title);
         additionalNotes = findViewById(R.id.additional_notes);
         btnWorkflow = findViewById(R.id.btn_workflow);
@@ -64,6 +81,10 @@ public class AddTaskActivity extends AppCompatActivity {
         switchDaily = findViewById(R.id.switch_daily);
         switchWeekly = findViewById(R.id.switch_weekly);
         switchMonthly = findViewById(R.id.switch_monthly);
+        
+        // Initialize time display with default values
+        updateTimeDisplay(true);
+        updateTimeDisplay(false);
 
         // Set initial colors
         btnWorkflow.setBackgroundColor(getResources().getColor(R.color.grey));
@@ -224,10 +245,11 @@ public class AddTaskActivity extends AppCompatActivity {
                                   calendar.get(Calendar.MONTH) == currentMonth && 
                                   calendar.get(Calendar.YEAR) == currentYear);
                 
-                // Highlight today's date with bold text
+                // Highlight today's date with bold text and white color
                 if (isToday) {
                     dateText.setTypeface(dateText.getTypeface(), android.graphics.Typeface.BOLD);
                     dateText.setBackgroundResource(R.drawable.today_date_background);
+                    dateText.setTextColor(getResources().getColor(android.R.color.white));
                 }
                 
                 // Set click listener to select this date
@@ -317,11 +339,9 @@ public class AddTaskActivity extends AppCompatActivity {
         // Calendar container click to show date picker
         findViewById(R.id.calendar_container).setOnClickListener(v -> showDatePicker());
 
-        // Time selection click listeners
-        fromTimeHours.setOnClickListener(v -> showTimePicker(true, true));
-        fromTimeMinutes.setOnClickListener(v -> showTimePicker(true, false));
-        toTimeHours.setOnClickListener(v -> showTimePicker(false, true));
-        toTimeMinutes.setOnClickListener(v -> showTimePicker(false, false));
+        // Time selection click listeners - now using Material Time Picker
+        fromTimeContainer.setOnClickListener(v -> showMaterialTimePicker(true));
+        toTimeContainer.setOnClickListener(v -> showMaterialTimePicker(false));
 
         // Task type selection - workflow and remainder only
         btnWorkflow.setOnClickListener(v -> {
@@ -421,36 +441,68 @@ public class AddTaskActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    private void showTimePicker(boolean isFromTime, boolean isHours) {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(
-                this,
-                (view, hourOfDay, minute) -> {
-                    if (isFromTime) {
-                        if (isHours) {
-                            fromTimeHours.setText(String.format(Locale.getDefault(), "%02d", hourOfDay));
-                        } else {
-                            fromTimeMinutes.setText(String.format(Locale.getDefault(), "%02d", minute));
-                        }
-                    } else {
-                        if (isHours) {
-                            toTimeHours.setText(String.format(Locale.getDefault(), "%02d", hourOfDay));
-                        } else {
-                            toTimeMinutes.setText(String.format(Locale.getDefault(), "%02d", minute));
-                        }
-                    }
-                },
-                isHours ? Integer.parseInt(isFromTime ? fromTimeHours.getText().toString() : toTimeHours.getText().toString()) : 0,
-                isHours ? 0 : Integer.parseInt(isFromTime ? fromTimeMinutes.getText().toString() : toTimeMinutes.getText().toString()),
-                true);
-
-        timePickerDialog.show();
+    /**
+     * Shows the Material Time Picker with scrolling wheels like alarm apps
+     */
+    private void showMaterialTimePicker(boolean isFromTime) {
+        int currentHour = isFromTime ? fromHour : toHour;
+        int currentMinute = isFromTime ? fromMinute : toMinute;
+        
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(currentHour)
+                .setMinute(currentMinute)
+                .setTitleText(isFromTime ? "Select Start Time" : "Select End Time")
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build();
+        
+        picker.addOnPositiveButtonClickListener(v -> {
+            int selectedHour = picker.getHour();
+            int selectedMinute = picker.getMinute();
+            
+            if (isFromTime) {
+                fromHour = selectedHour;
+                fromMinute = selectedMinute;
+            } else {
+                toHour = selectedHour;
+                toMinute = selectedMinute;
+            }
+            
+            updateTimeDisplay(isFromTime);
+        });
+        
+        picker.show(getSupportFragmentManager(), isFromTime ? "from_time_picker" : "to_time_picker");
+    }
+    
+    /**
+     * Updates the time display on the cards
+     */
+    private void updateTimeDisplay(boolean isFromTime) {
+        int hour = isFromTime ? fromHour : toHour;
+        int minute = isFromTime ? fromMinute : toMinute;
+        
+        // Convert to 12-hour format
+        String period = hour >= 12 ? "PM" : "AM";
+        int displayHour = hour % 12;
+        if (displayHour == 0) displayHour = 12;
+        
+        if (isFromTime) {
+            fromTimeHours.setText(String.format(Locale.getDefault(), "%02d", displayHour));
+            fromTimeMinutes.setText(String.format(Locale.getDefault(), "%02d", minute));
+            fromTimePeriod.setText(period);
+        } else {
+            toTimeHours.setText(String.format(Locale.getDefault(), "%02d", displayHour));
+            toTimeMinutes.setText(String.format(Locale.getDefault(), "%02d", minute));
+            toTimePeriod.setText(period);
+        }
     }
 
     private void submitTask() {
         String title = taskTitle.getText().toString().trim();
         String description = additionalNotes.getText().toString().trim();
-        String startTime = formatTimeForTaskManager(fromTimeHours.getText().toString(), fromTimeMinutes.getText().toString());
-        String endTime = formatTimeForTaskManager(toTimeHours.getText().toString(), toTimeMinutes.getText().toString());
+        // Use the stored 24-hour format values for task manager
+        String startTime = formatTimeForTaskManager(String.valueOf(fromHour), String.format(Locale.getDefault(), "%02d", fromMinute));
+        String endTime = formatTimeForTaskManager(String.valueOf(toHour), String.format(Locale.getDefault(), "%02d", toMinute));
 
         // Validate input
         if (title.isEmpty()) {
@@ -640,13 +692,16 @@ public class AddTaskActivity extends AppCompatActivity {
                     // Reset text style
                     dateText.setTypeface(null, isToday ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
                     
-                    // Set background based on whether it's selected or today
+                    // Set background and text color based on whether it's selected or today
                     if (isSelected) {
                         dateText.setBackgroundResource(R.drawable.selected_date_background);
+                        dateText.setTextColor(getResources().getColor(R.color.black));
                     } else if (isToday) {
                         dateText.setBackgroundResource(R.drawable.today_date_background);
+                        dateText.setTextColor(getResources().getColor(android.R.color.white));
                     } else {
                         dateText.setBackgroundResource(android.R.color.transparent);
+                        dateText.setTextColor(getResources().getColor(R.color.text_primary));
                     }
                 }
             }

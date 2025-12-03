@@ -35,6 +35,9 @@
             android:name=".HomepageActivity"
             android:exported="true" />
         <activity
+            android:name=".MainNavigationActivity"
+            android:exported="true" />
+        <activity
             android:name=".SignupActivity"
             android:exported="false" />
         <activity
