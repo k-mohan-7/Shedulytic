@@ -365,18 +365,32 @@ public class HabitManagerService {
     
     /**
      * Verify a habit as completed using checkbox method
+     * This is the primary method called from UI for checkbox-type habits
      */
     public void verifyHabitWithCheckbox(String habitId, boolean isCompleted) {
         Habit habit = habitsCache.get(habitId);
         if (habit == null) {
             Log.e(TAG, "Habit not found in cache: " + habitId);
-            return;
+            // Try to load from local database
+            habit = loadHabitFromLocalDb(habitId);
+            if (habit == null) {
+                Log.e(TAG, "Habit not found in local database either: " + habitId);
+                if (listener != null) {
+                    listener.onError("Habit not found");
+                }
+                return;
+            }
         }
         
-        if (!Habit.VERIFICATION_CHECKBOX.equals(habit.getVerificationMethod())) {
-            Log.e(TAG, "Habit does not use checkbox verification: " + habitId);
-            return;
+        // For checkbox type, accept any verification method (fallback behavior)
+        // This ensures habits work even if verification method isn't set correctly
+        String verificationMethod = habit.getVerificationMethod();
+        if (verificationMethod == null || verificationMethod.isEmpty()) {
+            verificationMethod = Habit.VERIFICATION_CHECKBOX;
+            habit.setVerificationMethod(verificationMethod);
         }
+        
+        Log.d(TAG, "Verifying habit: " + habitId + " with method: " + verificationMethod + ", completed: " + isCompleted);
         
         // Update habit completion status
         habit.setCompleted(isCompleted);
@@ -384,6 +398,8 @@ public class HabitManagerService {
         // If completed, increment total completions
         if (isCompleted) {
             habit.setTotalCompletions(habit.getTotalCompletions() + 1);
+            // Update streak
+            habit.setCurrentStreak(habit.getCurrentStreak() + 1);
         }
         
         // Update in cache
@@ -397,14 +413,50 @@ public class HabitManagerService {
             listener.onHabitVerified(habit, isCompleted);
         }
         
-        // Update streak
+        // Update streak on server
         updateHabitStreak(habitId, isCompleted);
         
         // Update overall progress
         calculateHabitProgress();
         
-        // Upload to server
+        // Upload to server and update XP
         updateHabitOnServer(habit, isCompleted);
+    }
+    
+    /**
+     * Load habit from local database
+     */
+    private Habit loadHabitFromLocalDb(String habitId) {
+        try {
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            String[] columns = {"habit_id", "user_id", "title", "description", "verification_method", 
+                               "is_completed", "current_streak", "total_completions", "frequency"};
+            String selection = "habit_id = ?";
+            String[] selectionArgs = {habitId};
+            Cursor cursor = db.query("habits", columns, selection, selectionArgs, null, null, null);
+            
+            if (cursor.moveToFirst()) {
+                Habit habit = new Habit();
+                habit.setHabitId(cursor.getString(cursor.getColumnIndexOrThrow("habit_id")));
+                habit.setUserId(cursor.getString(cursor.getColumnIndexOrThrow("user_id")));
+                habit.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+                habit.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
+                habit.setVerificationMethod(cursor.getString(cursor.getColumnIndexOrThrow("verification_method")));
+                habit.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow("is_completed")) == 1);
+                habit.setCurrentStreak(cursor.getInt(cursor.getColumnIndexOrThrow("current_streak")));
+                habit.setTotalCompletions(cursor.getInt(cursor.getColumnIndexOrThrow("total_completions")));
+                habit.setFrequency(cursor.getString(cursor.getColumnIndexOrThrow("frequency")));
+                cursor.close();
+                
+                // Add to cache
+                habitsCache.put(habitId, habit);
+                return habit;
+            }
+            cursor.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading habit from local DB: " + e.getMessage());
+        }
+        return null;
     }
     
     /**
@@ -414,17 +466,21 @@ public class HabitManagerService {
         Habit habit = habitsCache.get(habitId);
         if (habit == null) {
             Log.e(TAG, "Habit not found in cache: " + habitId);
-            return;
+            habit = loadHabitFromLocalDb(habitId);
+            if (habit == null) {
+                if (listener != null) {
+                    listener.onError("Habit not found");
+                }
+                return;
+            }
         }
         
-        if (!Habit.VERIFICATION_LOCATION.equals(habit.getVerificationMethod())) {
-            Log.e(TAG, "Habit does not use location verification: " + habitId);
-            return;
-        }
+        Log.d(TAG, "Verifying location habit: " + habitId);
         
         // Mark as completed
         habit.setCompleted(true);
         habit.setTotalCompletions(habit.getTotalCompletions() + 1);
+        habit.setCurrentStreak(habit.getCurrentStreak() + 1);
         
         // Update in cache
         habitsCache.put(habitId, habit);
@@ -454,17 +510,21 @@ public class HabitManagerService {
         Habit habit = habitsCache.get(habitId);
         if (habit == null) {
             Log.e(TAG, "Habit not found in cache: " + habitId);
-            return;
+            habit = loadHabitFromLocalDb(habitId);
+            if (habit == null) {
+                if (listener != null) {
+                    listener.onError("Habit not found");
+                }
+                return;
+            }
         }
         
-        if (!Habit.VERIFICATION_POMODORO.equals(habit.getVerificationMethod())) {
-            Log.e(TAG, "Habit does not use Pomodoro verification: " + habitId);
-            return;
-        }
+        Log.d(TAG, "Verifying pomodoro habit: " + habitId);
         
         // Mark as completed
         habit.setCompleted(true);
         habit.setTotalCompletions(habit.getTotalCompletions() + 1);
+        habit.setCurrentStreak(habit.getCurrentStreak() + 1);
         
         // Update in cache
         habitsCache.put(habitId, habit);
@@ -590,7 +650,7 @@ public class HabitManagerService {
     }
     
     /**
-     * Update habit on server
+     * Update habit on server and update local XP
      */
     private void updateHabitOnServer(Habit habit, boolean isCompleted) {
         try {
@@ -601,6 +661,7 @@ public class HabitManagerService {
             updateData.put("completed", isCompleted ? 1 : 0);
             updateData.put("current_streak", habit.getCurrentStreak());
             updateData.put("total_completions", habit.getTotalCompletions());
+            updateData.put("verification_type", habit.getVerificationMethod());
             
             // Current date
             String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
@@ -614,17 +675,93 @@ public class HabitManagerService {
                     @Override
                     public void onSuccess(JSONObject response) {
                         Log.d(TAG, "Habit updated on server: " + response.toString());
+                        
+                        // Update local XP if successful
+                        try {
+                            if (response.has("data")) {
+                                JSONObject data = response.getJSONObject("data");
+                                if (data.has("xp_earned")) {
+                                    float xpEarned = (float) data.getDouble("xp_earned");
+                                    if (xpEarned > 0) {
+                                        updateLocalXP(xpEarned, habit.getVerificationMethod());
+                                    }
+                                }
+                                if (data.has("streak")) {
+                                    int newStreak = data.getInt("streak");
+                                    habit.setCurrentStreak(newStreak);
+                                    habitsCache.put(habit.getHabitId(), habit);
+                                    if (listener != null) {
+                                        listener.onHabitStreakUpdated(habit.getHabitId(), newStreak);
+                                    }
+                                }
+                            }
+                        } catch (JSONException e) {
+                            Log.e(TAG, "Error parsing server response: " + e.getMessage());
+                        }
                     }
                     
                     @Override
                     public void onError(String errorMessage) {
                         Log.e(TAG, "Error updating habit on server: " + errorMessage);
+                        // Still update local XP even if server fails (offline support)
+                        if (isCompleted) {
+                            float xpEarned = getXPForVerificationType(habit.getVerificationMethod());
+                            updateLocalXP(xpEarned, habit.getVerificationMethod());
+                        }
                     }
                 }
             );
         } catch (Exception e) {
             Log.e(TAG, "Error preparing habit update: " + e.getMessage());
+            // Still update local XP on error
+            if (isCompleted) {
+                float xpEarned = getXPForVerificationType(habit.getVerificationMethod());
+                updateLocalXP(xpEarned, habit.getVerificationMethod());
+            }
         }
+    }
+    
+    /**
+     * Get XP reward for verification type
+     */
+    private float getXPForVerificationType(String verificationType) {
+        switch (verificationType) {
+            case Habit.VERIFICATION_POMODORO:
+                return 2.0f;
+            case Habit.VERIFICATION_LOCATION:
+                return 1.5f;
+            case Habit.VERIFICATION_CHECKBOX:
+            default:
+                return 1.0f;
+        }
+    }
+    
+    /**
+     * Update local XP in SharedPreferences
+     */
+    private void updateLocalXP(float xpEarned, String verificationType) {
+        SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        
+        // Update total XP
+        float totalXP = prefs.getFloat("xp_points_float", 0f);
+        totalXP += xpEarned;
+        editor.putFloat("xp_points_float", totalXP);
+        editor.putInt("xp_points", (int) totalXP);
+        editor.putInt("xp_coins", (int) totalXP); // Also update xp_coins for HomeFragment
+        
+        // Update habit-specific XP
+        float habitXP = prefs.getFloat("habit_xp", 0f);
+        habitXP += xpEarned;
+        editor.putFloat("habit_xp", habitXP);
+        
+        // Update habit completion count
+        int habitCount = prefs.getInt("habit_completed_count", 0);
+        editor.putInt("habit_completed_count", habitCount + 1);
+        
+        editor.apply();
+        
+        Log.d(TAG, "Updated local XP: +" + xpEarned + " (Total: " + totalXP + ", Habit XP: " + habitXP + ")");
     }
     
     /**

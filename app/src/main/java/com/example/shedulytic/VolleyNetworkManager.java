@@ -36,7 +36,8 @@ import java.util.Locale;
  */
 public class VolleyNetworkManager {
     private static final String TAG = "VolleyNetworkManager";
-    private static final String BASE_URL = "http://10.34.179.64/schedlytic/";
+    // Primary IP should match IpV4Connection.java for consistency
+    private static final String BASE_URL = "http://10.95.189.64/schedlytic/";
     private static final String FALLBACK_URL = "http://localhost/schedlytic/";
     private static final String LOCAL_URL = "http://10.0.2.2/schedlytic/";
     
@@ -510,17 +511,11 @@ public class VolleyNetworkManager {
     }
     
     /**
-     * Get all tasks URL for a user
+     * Get all tasks URL for a user (without date filter)
      */
     public String getAllTasksUrl(String userId) {
-        // Changed from get_all_tasks.php to get_today_tasks.php
-        // We'll use a date range to get all tasks
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        
-        // Get current date
-        String today = dateFormat.format(new Date());
-        
-        return activeBaseUrl + "get_today_tasks.php?date=" + today + "&user_id=" + userId;
+        // Pass all=true parameter to get all tasks regardless of date
+        return activeBaseUrl + "get_today_tasks.php?user_id=" + userId + "&all=true";
     }
     
     /**

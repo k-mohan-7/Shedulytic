@@ -357,7 +357,13 @@ public class Habit implements Parcelable, Serializable {
         
         android.util.Log.d("Habit", "Final verification method for " + habit.title + ": " + habit.verificationMethod);
         
-        habit.completed = json.optInt("completed", 0) == 1;
+        // Check completed_today first (from server with habit_completions join), fallback to completed
+        if (json.has("completed_today")) {
+            habit.completed = json.optInt("completed_today", 0) == 1;
+            android.util.Log.d("Habit", "Using completed_today: " + habit.completed);
+        } else {
+            habit.completed = json.optInt("completed", 0) == 1;
+        }
         habit.currentStreak = json.optInt("current_streak", 0);
         habit.totalCompletions = json.optInt("total_completions", 0);
         habit.frequency = json.optString("frequency", "daily");

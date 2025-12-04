@@ -84,9 +84,40 @@
                   android:exported="false"
                   android:theme="@android:style/Theme.Dialog" />
 
+        <!-- Reward Popup Activity -->
+        <activity 
+            android:name=".RewardPopupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Shedulytic.Transparent" />
+
+        <!-- Snooze Picker Activity -->
+        <activity 
+            android:name=".SnoozePickerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Shedulytic.Transparent"
+            android:excludeFromRecents="true" />
+        
+        <!-- Task Completion Activity (handles completion from notification) -->
+        <activity 
+            android:name=".TaskCompletionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Shedulytic.Transparent"
+            android:excludeFromRecents="true" />
+
         <!-- Notification Receivers -->
         <receiver android:name=".NotificationHandler$NotificationReceiver" android:exported="false" />
         <receiver android:name=".NotificationHandler$TaskActionReceiver" android:exported="false" />
+        
+        <!-- Reminder Notification Receivers -->
+        <receiver android:name=".ReminderNotificationManager$ReminderReceiver" android:exported="false" />
+        <receiver android:name=".ReminderNotificationManager$ReminderActionReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.shedulytic.COMPLETE_TASK" />
+                <action android:name="com.example.shedulytic.CANT_COMPLETE" />
+                <action android:name="com.example.shedulytic.SNOOZE_TASK" />
+                <action android:name="com.example.shedulytic.DISMISS_REMINDER" />
+            </intent-filter>
+        </receiver>
 
         <!-- Boot Receiver to reschedule notifications after device restart -->
         <receiver

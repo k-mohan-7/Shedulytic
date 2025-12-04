@@ -6,7 +6,9 @@ import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.shedulytic.service.HabitManagerService;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -23,12 +25,16 @@ public class PomodoroActivity extends AppCompatActivity {
     private boolean timerPaused;
 
     private String habitId;
+    private HabitManagerService habitManagerService;
 
     public static final String EXTRA_HABIT_ID = "com.example.shedulytic.EXTRA_HABIT_ID";
     public static final String EXTRA_POMODORO_LENGTH_MIN = "com.example.shedulytic.EXTRA_POMODORO_LENGTH_MIN";    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pomodoro_timer_layout);
+
+        // Initialize HabitManagerService
+        habitManagerService = HabitManagerService.getInstance(this);
 
         timerTextViewFullscreen = findViewById(R.id.timer_text);
         pauseResumeButtonFullscreen = findViewById(R.id.pause_button);
@@ -91,20 +97,30 @@ public class PomodoroActivity extends AppCompatActivity {
             public void onFinish() {
                 timerRunning = false;
                 timerPaused = false;
-                // Mark habit as completed for this pomodoro cycle
-                // TODO: Communicate completion back to calling fragment/activity or update DB
+                
+                // Mark habit as completed using HabitManagerService
+                habitManagerService.verifyHabitWithPomodoro(habitId);
                 
                 // Update UI to show completion
                 TextView progressText = findViewById(R.id.progress_text);
                 if (progressText != null) {
-                    progressText.setText("Hurray! Pomodoro Complete! Well done!");
+                    progressText.setText("🎉 Pomodoro Complete! Well done!");
                     progressText.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                 }
                 
+                // Show success toast
+                Toast.makeText(PomodoroActivity.this, 
+                    "🎉 Pomodoro completed! Habit marked as done!", Toast.LENGTH_SHORT).show();
+                
                 pauseResumeButtonFullscreen.setVisibility(View.GONE);
-                stopButtonFullscreen.setText("Close");
+                stopButtonFullscreen.setText("Close ✓");
                 stopButtonFullscreen.setOnClickListener(v -> finish());
-                // Potentially start next pomodoro cycle or break
+                
+                // Set result for calling activity
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("habitId", habitId);
+                resultIntent.putExtra("completed", true);
+                setResult(RESULT_OK, resultIntent);
             }
         }.start();        timerRunning = true;
         timerPaused = false;

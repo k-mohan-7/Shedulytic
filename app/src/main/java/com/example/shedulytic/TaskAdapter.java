@@ -183,36 +183,33 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private void updateTaskIcon(TaskViewHolder holder, Task task) {
         try {
             int iconResId;
-            int colorResId;
+            int gradientResId;
             String type = task.getType() != null ? task.getType().toLowerCase() : "";
             
             switch (type) {
                 case "workflow":
                     iconResId = R.drawable.ic_workflow;
-                    colorResId = R.color.workflow_color;
+                    gradientResId = R.drawable.gradient_workflow_card;
                     break;
                 case "remainder":
                     iconResId = R.drawable.ic_remainder;
-                    colorResId = R.color.remainder_color;
+                    gradientResId = R.drawable.gradient_reminder_card;
                     break;
                 case "habit":
                     iconResId = R.drawable.ic_remainder; // Use appropriate habit icon if available
-                    colorResId = R.color.habit_color;
+                    gradientResId = R.drawable.gradient_habit_card;
                     break;
                 default:
-                    // Default to remainder icon if type is unrecognized
+                    // Default to reminder icon and gradient if type is unrecognized
                     iconResId = R.drawable.ic_remainder;
-                    colorResId = R.color.default_task_color;
+                    gradientResId = R.drawable.gradient_default_card;
                     break;
             }
             holder.typeIcon.setImageResource(iconResId);
             
-            // Set type icon background color based on task type
+            // Set gradient background based on task type
             if (holder.backgroundLayout != null) {
-                GradientDrawable leftBorder = new GradientDrawable();
-                leftBorder.setShape(GradientDrawable.RECTANGLE);
-                leftBorder.setColor(ContextCompat.getColor(context, colorResId));
-                holder.backgroundLayout.setBackground(leftBorder);
+                holder.backgroundLayout.setBackgroundResource(gradientResId);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error updating task icon: " + e.getMessage());
@@ -226,7 +223,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         private final TextView durationTextView;
         private final TextView taskTypeTextView;
         private final ImageView typeIcon;
-        private final LinearLayout backgroundLayout;
+        private final View backgroundLayout;
         private final CheckBox checkboxView;
 
         public TaskViewHolder(@NonNull View itemView) {

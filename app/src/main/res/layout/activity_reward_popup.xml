@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99000000"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Confetti particles -->
+    <View
+        android:id="@+id/confetti_1"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/gold"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/confetti_2"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="50dp"
+        android:background="@color/darkGreen"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/confetti_3"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginEnd="60dp"
+        android:background="@color/primary_blue"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/confetti_4"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="80dp"
+        android:background="@color/accent_pink"
+        android:visibility="gone" />
+
+    <!-- Main Popup Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/popup_card"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <!-- Animated Icon -->
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="16dp">
+
+                <!-- Glow background -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/circle_glow_background" />
+
+                <!-- Star/Icon -->
+                <ImageView
+                    android:id="@+id/icon_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_star"
+                    app:tint="@color/gold" />
+
+            </FrameLayout>
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="🎉 Task Completed!"
+                android:textColor="@color/darkGreen"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- XP Text with animation -->
+            <TextView
+                android:id="@+id/xp_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="+2.0 XP"
+                android:textColor="@color/success_green"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <!-- Message -->
+            <TextView
+                android:id="@+id/message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Great job completing your task on time!"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <!-- Tap to dismiss hint -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:alpha="0.6"
+                android:text="Tap anywhere to dismiss"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

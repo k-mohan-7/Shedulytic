@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.shedulytic.service.HabitManagerService;
 import java.util.Locale;
 
 public class LocationVerificationActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class LocationVerificationActivity extends AppCompatActivity {
     private Button verifyButton;
 
     private FusedLocationProviderClient fusedLocationClient;
+    private HabitManagerService habitManagerService;
 
     private String habitId;
     private String habitTitle;
@@ -44,6 +46,9 @@ public class LocationVerificationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_verification);
+        
+        // Initialize HabitManagerService
+        habitManagerService = HabitManagerService.getInstance(this);
         
         habitTitleTextView = findViewById(R.id.loc_verify_habit_title);
         habitDescriptionTextView = findViewById(R.id.loc_verify_habit_description);
@@ -137,16 +142,23 @@ public class LocationVerificationActivity extends AppCompatActivity {
                     if (distanceInMeters <= VERIFICATION_RADIUS_METERS) {
                         statusTextView.setText(String.format(Locale.getDefault(), "Verified! You are %.1fm from target.", distanceInMeters));
                         statusTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                        // TODO: Communicate success back to the calling fragment/activity
-                        // Mark habit as completed, update database etc.
+                        
+                        // Mark habit as completed using HabitManagerService
+                        habitManagerService.verifyHabitWithLocation(habitId);
+                        
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("habitId", habitId);
                         resultIntent.putExtra("verified", true);
                         setResult(RESULT_OK, resultIntent);
-                        verifyButton.setText("Verified! Close");
-                        verifyButton.setEnabled(false); 
-                        // Optionally finish after a delay
-                        // finish(); 
+                        verifyButton.setText("Verified! ✓");
+                        verifyButton.setEnabled(false);
+                        
+                        // Show success toast
+                        Toast.makeText(LocationVerificationActivity.this, 
+                            "🎉 Location verified! Habit completed!", Toast.LENGTH_SHORT).show();
+                        
+                        // Close after a short delay
+                        verifyButton.postDelayed(() -> finish(), 1500); 
             } else {
                         statusTextView.setText(String.format(Locale.getDefault(), "Not yet there. You are %.1fm away. Required: %.0fm", distanceInMeters, VERIFICATION_RADIUS_METERS));
                         statusTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));

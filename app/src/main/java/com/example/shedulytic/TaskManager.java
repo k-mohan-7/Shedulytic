@@ -29,6 +29,7 @@ public class TaskManager {
     private final TaskListener listener;
     private final VolleyNetworkManager networkManager;
     private final NotificationHandler notificationHandler;
+    private final ReminderNotificationManager reminderNotificationManager;
 
     public interface TaskListener {
         void onTasksLoaded(java.util.List<Task> tasks);
@@ -42,6 +43,7 @@ public class TaskManager {
         this.listener = listener;
         this.networkManager = VolleyNetworkManager.getInstance(context);
         this.notificationHandler = new NotificationHandler(context);
+        this.reminderNotificationManager = new ReminderNotificationManager(context);
     }
 
     /**
@@ -576,6 +578,83 @@ public class TaskManager {
             5000 // Reduce timeout to 5 seconds for faster response
         );
     }
+    
+    /**
+     * Load all tasks from server without date filter for timeline filtering
+     */
+    public void loadAllTasks() {
+        String endpoint = networkManager.getAllTasksUrl(getUserId());
+        Log.d(TAG, "Loading all tasks from: " + endpoint);
+        
+        VolleyNetworkManager.getInstance(context).makeGetRequestWithTimeout(
+            endpoint,
+            new VolleyNetworkManager.JsonResponseListener() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    try {
+                        Log.d(TAG, "All tasks response: " + response.toString().substring(0, Math.min(200, response.toString().length())));
+                        List<Task> tasks = new ArrayList<>();
+                        
+                        if (response.has("tasks")) {
+                            JSONArray tasksArray = response.getJSONArray("tasks");
+                            for (int i = 0; i < tasksArray.length(); i++) {
+                                JSONObject taskObject = tasksArray.getJSONObject(i);
+                                
+                                String taskId = taskObject.optString("id", taskObject.optString("task_id", ""));
+                                String taskType = taskObject.optString("type", "remainder").toLowerCase();
+                                String title = taskObject.optString("title", "Untitled Task");
+                                String description = taskObject.optString("description", "");
+                                String startTime = taskObject.optString("start_time", "");
+                                String endTime = taskObject.optString("end_time", "");
+                                String dueDate = taskObject.optString("due_date", "");
+                                String status = taskObject.optString("status", "pending");
+                                String repeatFrequency = taskObject.optString("repeat_frequency", "none");
+                                String priority = taskObject.optString("priority", "medium");
+                                
+                                if (!taskType.equals("workflow") && !taskType.equals("remainder")) {
+                                    taskType = "remainder";
+                                }
+                                
+                                Task task = new Task(
+                                    taskId,
+                                    getUserId(),
+                                    taskType,
+                                    title,
+                                    description,
+                                    startTime,
+                                    endTime,
+                                    dueDate,
+                                    status,
+                                    repeatFrequency,
+                                    priority
+                                );
+                                
+                                tasks.add(task);
+                            }
+                        }
+                        
+                        if (listener != null) {
+                            listener.onTasksLoaded(tasks);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing all tasks: " + e.getMessage());
+                        if (listener != null) {
+                            listener.onError("Failed to load all tasks: " + e.getMessage());
+                        }
+                    }
+                }
+                
+                @Override
+                public void onError(String message) {
+                    Log.e(TAG, "Error loading all tasks: " + message);
+                    if (listener != null) {
+                        listener.onError("Failed to load all tasks from server.");
+                    }
+                }
+            },
+            8000
+        );
+    }
 
     // Update clearDeletedTasks method to be more effective
     public void clearDeletedTasks() {
@@ -798,7 +877,7 @@ public class TaskManager {
     private void tryUpdateTaskTimeWithDirectIp(String taskId, String startTime, String endTime, String previousError) {
         try {
             String[] ipUrls = {
-                "http://10.34.179.64/schedlytic/update_task.php",
+                IpV4Connection.getBaseUrl() + "update_task.php",  // Use centralized IP
                 "http://10.0.2.2/schedlytic/update_task.php"
             };
             
@@ -1012,12 +1091,13 @@ public class TaskManager {
 
             // Cancel any existing notifications for this task first
             notificationHandler.cancelTaskNotifications(task.getTaskId());
+            reminderNotificationManager.cancelReminderNotifications(task.getTaskId());
 
             String taskType = task.getType() != null ? task.getType().toLowerCase() : "remainder";
             
             // Schedule appropriate notifications based on task type
             if ("workflow".equals(taskType)) {
-                // For workflow tasks: schedule start, end, and reminder notifications
+                // For workflow tasks: use old NotificationHandler for start/end notifications
                 notificationHandler.scheduleWorkflowNotifications(
                     task.getTaskId(),
                     task.getTitle(),
@@ -1027,16 +1107,10 @@ public class TaskManager {
                     task.getDueDate()
                 );
                 Log.d(TAG, "Scheduled workflow notifications for task: " + task.getTitle());
-            } else {
-                // For remainder tasks: schedule reminder notification
-                notificationHandler.scheduleReminderNotification(
-                    task.getTaskId(),
-                    task.getTitle(),
-                    task.getDescription(),
-                    task.getStartTime(),
-                    task.getDueDate()
-                );
-                Log.d(TAG, "Scheduled reminder notification for task: " + task.getTitle());
+            } else if (task.isRemainder()) {
+                // For remainder tasks: use new ReminderNotificationManager
+                reminderNotificationManager.scheduleReminderNotifications(task);
+                Log.d(TAG, "Scheduled reminder notifications for task: " + task.getTitle());
             }
         } catch (Exception e) {
             Log.e(TAG, "Error scheduling notifications for task: " + e.getMessage(), e);
@@ -1138,9 +1212,9 @@ public class TaskManager {
      * Try to add a task using direct IP addresses as a fallback
      */
     private void tryAddTaskWithDirectIp(Task task, String previousError) {
-        try {            // Get direct IP addresses to try
+        try {            // Get direct IP addresses to try - use centralized IP configuration
             String[] ipAddresses = {
-                "http://10.34.179.64/schedlytic/add_task.php",
+                IpV4Connection.getBaseUrl() + "add_task.php",  // Use centralized IP
                 "http://10.0.2.2/schedlytic/add_task.php"
             };
             

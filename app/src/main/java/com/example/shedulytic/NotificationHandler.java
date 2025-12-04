@@ -634,7 +634,7 @@ public class NotificationHandler {
             remoteViews.setTextViewText(R.id.task_message, "Time to start: " + taskTitle);
             remoteViews.setTextViewText(R.id.notification_time, getCurrentTimeString());
             
-            // Create action intents
+            // Create action intents - Start button
             Intent startIntent = new Intent(context, TaskActionReceiver.class);
             startIntent.putExtra("task_id", taskId);
             startIntent.putExtra("action", ACTION_START_TASK);
@@ -642,6 +642,16 @@ public class NotificationHandler {
                     context, Integer.parseInt(taskId) * 100, startIntent, 
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             
+            // Extend button - extends the start time
+            Intent extendIntent = new Intent(context, TaskActionReceiver.class);
+            extendIntent.putExtra("task_id", taskId);
+            extendIntent.putExtra("action", ACTION_EXTEND_TASK);
+            extendIntent.putExtra("extend_type", "start"); // Mark as start time extension
+            PendingIntent extendPendingIntent = PendingIntent.getBroadcast(
+                    context, Integer.parseInt(taskId) * 100 + 4, extendIntent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            
+            // Can't Start button
             Intent cantIntent = new Intent(context, TaskActionReceiver.class);
             cantIntent.putExtra("task_id", taskId);
             cantIntent.putExtra("action", ACTION_CANT_COMPLETE);
@@ -649,8 +659,9 @@ public class NotificationHandler {
                     context, Integer.parseInt(taskId) * 100 + 1, cantIntent, 
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             
-            // Set button click listeners
+            // Set button click listeners for 3-button layout
             remoteViews.setOnClickPendingIntent(R.id.button_left, startPendingIntent);
+            remoteViews.setOnClickPendingIntent(R.id.button_center, extendPendingIntent);
             remoteViews.setOnClickPendingIntent(R.id.button_right, cantPendingIntent);
             
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, WORKFLOW_CHANNEL_ID)
@@ -663,8 +674,9 @@ public class NotificationHandler {
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
             
             // Add fallback action buttons for devices that don't support custom views
-            builder.addAction(R.drawable.ic_play_arrow, "Start Now", startPendingIntent);
-            builder.addAction(R.drawable.ic_close, "Can't Do", cantPendingIntent);
+            builder.addAction(R.drawable.ic_play_arrow, "Start", startPendingIntent);
+            builder.addAction(R.drawable.ic_schedule, "Extend", extendPendingIntent);
+            builder.addAction(R.drawable.ic_close, "Can't", cantPendingIntent);
             
             return builder;
         }
@@ -677,7 +689,7 @@ public class NotificationHandler {
             remoteViews.setTextViewText(R.id.task_message, "Time to finish: " + taskTitle);
             remoteViews.setTextViewText(R.id.notification_time, getCurrentTimeString());
             
-            // Create action intents
+            // Create action intents - Complete button
             Intent completeIntent = new Intent(context, TaskActionReceiver.class);
             completeIntent.putExtra("task_id", taskId);
             completeIntent.putExtra("action", ACTION_COMPLETE_TASK);
@@ -685,16 +697,27 @@ public class NotificationHandler {
                     context, Integer.parseInt(taskId) * 100 + 2, completeIntent, 
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             
+            // Extend button - extends the end time
             Intent extendIntent = new Intent(context, TaskActionReceiver.class);
             extendIntent.putExtra("task_id", taskId);
             extendIntent.putExtra("action", ACTION_EXTEND_TASK);
+            extendIntent.putExtra("extend_type", "end"); // Mark as end time extension
             PendingIntent extendPendingIntent = PendingIntent.getBroadcast(
                     context, Integer.parseInt(taskId) * 100 + 3, extendIntent, 
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             
-            // Set button click listeners
+            // Can't Complete button
+            Intent cantIntent = new Intent(context, TaskActionReceiver.class);
+            cantIntent.putExtra("task_id", taskId);
+            cantIntent.putExtra("action", ACTION_CANT_COMPLETE);
+            PendingIntent cantPendingIntent = PendingIntent.getBroadcast(
+                    context, Integer.parseInt(taskId) * 100 + 5, cantIntent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            
+            // Set button click listeners for 3-button layout
             remoteViews.setOnClickPendingIntent(R.id.button_left, completePendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.button_right, extendPendingIntent);
+            remoteViews.setOnClickPendingIntent(R.id.button_center, extendPendingIntent);
+            remoteViews.setOnClickPendingIntent(R.id.button_right, cantPendingIntent);
             
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, WORKFLOW_CHANNEL_ID)
                     .setSmallIcon(R.drawable.workflow_logo)
@@ -706,8 +729,9 @@ public class NotificationHandler {
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
             
             // Add fallback action buttons for devices that don't support custom views
-            builder.addAction(R.drawable.ic_check, "Completed", completePendingIntent);
-            builder.addAction(R.drawable.ic_schedule, "Extend Time", extendPendingIntent);
+            builder.addAction(R.drawable.ic_check, "Done", completePendingIntent);
+            builder.addAction(R.drawable.ic_schedule, "Extend", extendPendingIntent);
+            builder.addAction(R.drawable.ic_close, "Can't", cantPendingIntent);
             
             return builder;
         }
@@ -844,16 +868,44 @@ public class NotificationHandler {
         }
         
         private void handleCompleteTask(Context context, String taskId) {
-            TaskManager taskManager = new NotificationHandler(context).createTaskManager(context, taskId, "Task completed successfully");
-            taskManager.updateTaskCompletion(taskId, true);
-            
-            // Dismiss notification
+            // Dismiss notification first
             NotificationManager notificationManager = 
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(Integer.parseInt(taskId));
             
-            // Show completion toast
-            android.widget.Toast.makeText(context, "Task marked as completed", android.widget.Toast.LENGTH_SHORT).show();
+            // Check if task was extended - if so, no reward
+            android.content.SharedPreferences prefs = context.getSharedPreferences("ExtendedTasks", Context.MODE_PRIVATE);
+            boolean wasExtended = prefs.getBoolean("extended_" + taskId, false);
+            
+            // Clear the extended flag after reading
+            if (wasExtended) {
+                prefs.edit().remove("extended_" + taskId).apply();
+                Log.d("TaskActionReceiver", "Task " + taskId + " was extended - no XP reward");
+            }
+            
+            // Use ReminderNotificationManager for proper reward handling (+2.5 XP for workflow, 0 if extended)
+            ReminderNotificationManager reminderManager = new ReminderNotificationManager(context);
+            reminderManager.handleWorkflowCompletion(taskId, "completed", wasExtended, new ReminderNotificationManager.TaskCompletionCallback() {
+                @Override
+                public void onSuccess(double xpChange) {
+                    // Show reward popup (or no-reward message if extended)
+                    Intent rewardIntent = new Intent(context, RewardPopupActivity.class);
+                    rewardIntent.putExtra("xp_change", xpChange);
+                    rewardIntent.putExtra("task_title", "Workflow Task");
+                    rewardIntent.putExtra("is_reward", xpChange > 0);
+                    if (wasExtended) {
+                        rewardIntent.putExtra("was_extended", true);
+                    }
+                    rewardIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(rewardIntent);
+                }
+                
+                @Override
+                public void onError(String message) {
+                    Log.e("TaskActionReceiver", "Error completing workflow task: " + message);
+                    android.widget.Toast.makeText(context, "Task completed!", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         
         private void handleExtendTask(Context context, String taskId) {
@@ -888,6 +940,11 @@ public class NotificationHandler {
         }
         
         private void handleCantComplete(Context context, String taskId) {
+            // Dismiss notification first
+            NotificationManager notificationManager = 
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(Integer.parseInt(taskId));
+            
             // Show dialog for rescheduling or canceling task
             Intent dialogIntent = new Intent(context, CantCompleteTaskActivity.class);
             dialogIntent.putExtra("task_id", taskId);
@@ -1297,6 +1354,11 @@ public class NotificationHandler {
                 
                 String newEndTime = timeFormat.format(calendar.getTime());
                 
+                // Mark task as extended - no XP reward when completed after extending
+                android.content.SharedPreferences prefs = getSharedPreferences("ExtendedTasks", Context.MODE_PRIVATE);
+                prefs.edit().putBoolean("extended_" + task.getTaskId(), true).apply();
+                android.util.Log.d("ExtendTaskActivity", "Marked task " + task.getTaskId() + " as extended - no reward on completion");
+                
                 TaskManager taskManager = new TaskManager(this, new TaskManager.TaskListener() {
                     @Override
                     public void onTasksLoaded(java.util.List<Task> tasks) {}
@@ -1426,28 +1488,34 @@ public class NotificationHandler {
         }
         
         private void cancelTask(String taskId) {
-            TaskManager taskManager = new TaskManager(this, new TaskManager.TaskListener() {
+            // Apply penalty for not completing task (-0.5 XP)
+            ReminderNotificationManager reminderManager = new ReminderNotificationManager(this);
+            reminderManager.handleWorkflowCompletion(taskId, "cant_complete", false, new ReminderNotificationManager.TaskCompletionCallback() {
                 @Override
-                public void onTasksLoaded(java.util.List<Task> tasks) {}
+                public void onSuccess(double xpChange) {
+                    // Show penalty popup
+                    Intent penaltyIntent = new Intent(CantCompleteTaskActivity.this, RewardPopupActivity.class);
+                    penaltyIntent.putExtra("xp_change", xpChange);
+                    penaltyIntent.putExtra("task_title", "Task");
+                    penaltyIntent.putExtra("is_reward", false);
+                    penaltyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(penaltyIntent);
+                }
+                
                 @Override
-                public void onTaskAdded(Task task) {}
-                @Override
-                public void onTaskUpdated(Task task) {}
-                @Override
-                public void onTaskDeleted(String deletedTaskId) {
+                public void onError(String message) {
                     android.widget.Toast.makeText(CantCompleteTaskActivity.this, "Task cancelled", android.widget.Toast.LENGTH_SHORT).show();
                 }
-                @Override
-                public void onError(String message) {}
-                @Override
-                public void onHabitStreakUpdated(String taskId, int newStreak) {}
             });
-            
-            taskManager.deleteTask(taskId);
             
             // Cancel notifications
             NotificationHandler handler = new NotificationHandler(this);
             handler.cancelTaskNotifications(taskId);
+            
+            // Dismiss notification
+            NotificationManager notificationManager = 
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(Integer.parseInt(taskId));
         }
         
         private void snoozeTask(String taskId, int minutes) {

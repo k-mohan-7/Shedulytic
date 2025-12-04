@@ -440,6 +440,24 @@ public class TodayActivitiesManager {
                         avatarUrl = response.getJSONObject("user").getString("avatar");
                     }
                     
+                    // Extract XP points and save to SharedPreferences
+                    int xpPoints = 0;
+                    if (response.has("xp_points")) {
+                        xpPoints = response.getInt("xp_points");
+                    } else if (response.has("user") && response.getJSONObject("user").has("xp_points")) {
+                        xpPoints = response.getJSONObject("user").getInt("xp_points");
+                    }
+                    
+                    // Save XP and streak to SharedPreferences for ProfileFragment and HomeFragment
+                    SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt("xp_points", xpPoints);
+                    editor.putInt("xp_coins", xpPoints); // Also save as xp_coins for HomeFragment
+                    editor.putFloat("xp_points_float", (float) xpPoints);
+                    editor.putInt("streak_count", streakCount);
+                    editor.apply();
+                    Log.d(TAG, "Saved XP: " + xpPoints + ", Streak: " + streakCount + " to SharedPreferences");
+                    
                     if (listener != null) {
                         listener.onUserProfileLoaded(userName, streakCount, avatarUrl);
                     }

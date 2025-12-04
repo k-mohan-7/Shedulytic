@@ -121,25 +121,21 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.HabitViewHol
     @NonNull
     @Override
     public HabitViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int layoutResource;
-        
-        // Select layout based on view type (verification method)
+        // Use separate layouts for each verification type with circular progress
+        int layoutRes;
         switch (viewType) {
-            case VIEW_TYPE_CHECKBOX:
-                layoutResource = R.layout.checkbox_verification_layout;
-                break;
             case VIEW_TYPE_LOCATION:
-                layoutResource = R.layout.location_verification_layout;
+                layoutRes = R.layout.item_habit_location;
                 break;
             case VIEW_TYPE_POMODORO:
-                layoutResource = R.layout.pomodoro_verification_layout;
+                layoutRes = R.layout.item_habit_pomodoro;
                 break;
+            case VIEW_TYPE_CHECKBOX:
             default:
-                layoutResource = R.layout.checkbox_verification_layout; // Default fallback
+                layoutRes = R.layout.item_habit_check;
                 break;
         }
-        
-        View view = LayoutInflater.from(parent.getContext()).inflate(layoutResource, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutRes, parent, false);
         return new HabitViewHolder(view, viewType);
     }
     
@@ -149,262 +145,235 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.HabitViewHol
         Context context = contextRef.get();
         HabitInteractionListener listener = listenerRef.get();
         
-        if (context == null || listener == null) return;
+        if (context == null) return;
         
-        // Set basic habit info
-        holder.titleTextView.setText(habit.getTitle());
+        // Set habit title
+        if (holder.titleTextView != null) {
+            holder.titleTextView.setText(habit.getTitle());
+        }
         
-        String description = habit.getDescription();
-        holder.descriptionTextView.setVisibility(description != null && !description.isEmpty() ? View.VISIBLE : View.GONE);
-        holder.descriptionTextView.setText(description);
+        // Calculate and set progress percentage based on daily completion rate
+        int progressPercent = calculateHabitProgress(habit);
         
-        // Note: Streak and progress views are not available in the new simplified layouts
-        // These features will be handled differently in the new design
+        if (holder.habitProgress != null) {
+            holder.habitProgress.setProgress(progressPercent);
+        }
         
-        // Note: Container views don't exist in the new simplified layouts
+        if (holder.percentageTextView != null) {
+            holder.percentageTextView.setText(progressPercent + "%");
+        }
         
-        // Show the appropriate verification view based on type
-        String verificationMethod = habit.getVerificationMethod();
-        Log.d(TAG, "Habit " + habit.getTitle() + " has verification method: " + verificationMethod);
+        // Set streak info
+        if (holder.streakTextView != null) {
+            int streak = habit.getCurrentStreak();
+            holder.streakTextView.setText(streak + " day streak");
+        }
         
-        // Check extra properties for trust_type but DO NOT override verification method
-        // The verification method should already be correctly set by Habit.fromJson()
-        JSONObject extraProps = habit.getExtraProperties();
-        if (extraProps != null) {
-            try {
-                String trustType = ((org.json.JSONObject) extraProps).optString("trust_type", "");
-                Log.d(TAG, "Trust type from extra properties: " + trustType);
-                // Don't override the verification method here - it should already be correct
-            } catch (Exception e) {
-                Log.e(TAG, "Error reading trust_type: " + e.getMessage());
+        // Bind type-specific views
+        int viewType = holder.viewType;
+        switch (viewType) {
+            case VIEW_TYPE_CHECKBOX:
+                bindCheckboxHabit(holder, habit, listener);
+                break;
+            case VIEW_TYPE_POMODORO:
+                bindPomodoroHabit(holder, habit, listener, context);
+                break;
+            case VIEW_TYPE_LOCATION:
+                bindLocationHabit(holder, habit, listener, context);
+                break;
+        }
+        
+        // Apply completed state styling
+        if (holder.habitCard != null) {
+            holder.habitCard.setAlpha(habit.isCompleted() ? 0.7f : 1.0f);
+        }
+        
+        // Update progress from stored progress map if available
+        if (progressMap.containsKey(habit.getHabitId())) {
+            float storedProgress = progressMap.get(habit.getHabitId());
+            int storedPercent = Math.round(storedProgress * 100);
+            if (holder.habitProgress != null) {
+                holder.habitProgress.setProgress(storedPercent);
+            }
+            if (holder.percentageTextView != null) {
+                holder.percentageTextView.setText(storedPercent + "%");
+            }
+        }
+    }
+    
+    private void bindCheckboxHabit(HabitViewHolder holder, Habit habit, HabitInteractionListener listener) {
+        if (holder.btnMarkComplete != null) {
+            if (habit.isCompleted()) {
+                holder.btnMarkComplete.setText("Done ✓");
+                holder.btnMarkComplete.setEnabled(false);
+                holder.btnMarkComplete.setAlpha(0.6f);
+            } else {
+                holder.btnMarkComplete.setText("Done");
+                holder.btnMarkComplete.setEnabled(true);
+                holder.btnMarkComplete.setAlpha(1.0f);
+            }
+            
+            holder.btnMarkComplete.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onHabitChecked(habit.getHabitId(), true);
+                }
+            });
+        }
+    }
+    
+    private void bindPomodoroHabit(HabitViewHolder holder, Habit habit, HabitInteractionListener listener, Context context) {
+        String habitId = habit.getHabitId();
+        boolean isActive = activePomodoros.containsKey(habitId) && activePomodoros.get(habitId);
+        
+        if (holder.pomodoroTime != null) {
+            if (pomodoroTimes.containsKey(habitId)) {
+                long timeRemaining = pomodoroTimes.get(habitId);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(timeRemaining);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(timeRemaining) % 60;
+                holder.pomodoroTime.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
+            } else {
+                holder.pomodoroTime.setText("25:00");
             }
         }
         
-        switch (verificationMethod) {
-            case Habit.VERIFICATION_CHECKBOX:
-                setupCheckboxVerification(holder, habit);
-                break;
-            case Habit.VERIFICATION_LOCATION:
-                setupLocationVerification(holder, habit);
-                break;
-            case Habit.VERIFICATION_POMODORO:
-                setupPomodoroVerification(holder, habit);
-                break;
-            default:
-                // Default to checkbox if verification method is unknown
-                setupCheckboxVerification(holder, habit);
-                break;
+        if (holder.pomodoroStatus != null) {
+            if (habit.isCompleted()) {
+                holder.pomodoroStatus.setText("Session completed today! ✓");
+            } else if (isActive) {
+                int completed = pomodoroProgress.getOrDefault(habitId, 0);
+                int total = pomodoroTotals.getOrDefault(habitId, 1);
+                holder.pomodoroStatus.setText("Focus session " + completed + "/" + total);
+            } else {
+                holder.pomodoroStatus.setText("Tap Start to begin focus session");
+            }
         }
         
-        // Set card appearance
-        int cardColor = context.getResources().getColor(
-                habit.isCompleted() ? R.color.habit_dark_color : R.color.habit_color);
-        if (holder.habitCard != null) {
-            holder.habitCard.setCardBackgroundColor(cardColor);
+        if (holder.btnStartPomodoro != null) {
+            if (habit.isCompleted()) {
+                holder.btnStartPomodoro.setText("Done");
+                holder.btnStartPomodoro.setEnabled(false);
+                holder.btnStartPomodoro.setAlpha(0.6f);
+            } else if (isActive) {
+                holder.btnStartPomodoro.setText("Pause");
+                holder.btnStartPomodoro.setEnabled(true);
+                holder.btnStartPomodoro.setAlpha(1.0f);
+            } else {
+                holder.btnStartPomodoro.setText("Start");
+                holder.btnStartPomodoro.setEnabled(true);
+                holder.btnStartPomodoro.setAlpha(1.0f);
+            }
+            
+            holder.btnStartPomodoro.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPomodoroStartClicked(habitId);
+                }
+            });
+        }
+    }
+    
+    private void bindLocationHabit(HabitViewHolder holder, Habit habit, HabitInteractionListener listener, Context context) {
+        // Get location name from habit extra properties
+        String locName = "Location";
+        JSONObject extraProps = habit.getExtraProperties();
+        if (extraProps != null) {
+            locName = extraProps.optString("location_name", "Location");
+            if (locName.isEmpty()) {
+                locName = extraProps.optString("address", "Location");
+            }
+        }
+        
+        if (holder.locationName != null) {
+            holder.locationName.setText(locName);
+        }
+        
+        if (holder.locationDistance != null) {
+            if (habit.isCompleted()) {
+                holder.locationDistance.setText("Location verified today! ✓");
+            } else {
+                holder.locationDistance.setText("Tap Verify when you arrive");
+            }
+        }
+        
+        if (holder.btnVerifyLocation != null) {
+            if (habit.isCompleted()) {
+                holder.btnVerifyLocation.setText("Verified");
+                holder.btnVerifyLocation.setEnabled(false);
+                holder.btnVerifyLocation.setAlpha(0.6f);
+            } else {
+                holder.btnVerifyLocation.setText("Verify");
+                holder.btnVerifyLocation.setEnabled(true);
+                holder.btnVerifyLocation.setAlpha(1.0f);
+            }
+            
+            holder.btnVerifyLocation.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onLocationVerifyClicked(habit.getHabitId());
+                }
+            });
         }
     }
     
     /**
-     * Set up checkbox verification UI
+     * Calculate habit progress percentage based on completion rate
+     * Uses total completions vs expected completions based on frequency
      */
-    private void setupCheckboxVerification(HabitViewHolder holder, Habit habit) {
-        Log.d(TAG, "Setting up checkbox verification for habit: " + habit.getTitle());
-        
-        // Note: Container views don't exist in new simplified layouts
-        
-        // Set up the verify button for checkbox verification
-        if (holder.verifyButton != null) {
-            if (habit.isCompleted()) {
-                holder.verifyButton.setText("Completed");
-                holder.verifyButton.setEnabled(false);
-            } else {
-                holder.verifyButton.setText("Mark Complete");
-                holder.verifyButton.setEnabled(true);
-                
-                holder.verifyButton.setOnClickListener(v -> {
-                    HabitInteractionListener listener = listenerRef.get();
-                    if (listener != null) {
-                        listener.onHabitChecked(habit.getHabitId(), true);
-                    }
-                });
-            }
-        } else {
-            Log.e(TAG, "Verify button is null");
+    private int calculateHabitProgress(Habit habit) {
+        // If completed today, return 100%
+        if (habit.isCompleted()) {
+            return 100;
         }
         
-        // Set icon for checkbox verification
-        if (holder.habitIcon != null) {
-            holder.habitIcon.setImageResource(R.drawable.ic_check);
+        // Calculate based on streak and total completions
+        int totalCompletions = habit.getTotalCompletions();
+        int currentStreak = habit.getCurrentStreak();
+        
+        // Simple progress calculation:
+        // - If never completed, 0%
+        // - If has completions but not today, calculate based on recent streak
+        if (totalCompletions == 0) {
+            return 0;
         }
         
-        // Set card color for checkbox habits
-        if (holder.habitCard != null) {
-            Context context = holder.habitCard.getContext();
-            int cardColor = context.getResources().getColor(habit.isCompleted() ? 
-                    R.color.habit_dark_color : R.color.habit_color);
-            holder.habitCard.setCardBackgroundColor(cardColor);
-        }
+        // Use streak as a rough indicator (max 7 days for 100%)
+        // This gives a visual representation of consistency
+        int progress = Math.min(100, (currentStreak * 100) / 7);
         
-        // Ensure the verification method is saved correctly
-        try {
-            JSONObject extraProps = habit.getExtraProperties();
-            if (extraProps == null) {
-                extraProps = new JSONObject();
-                habit.setExtraProperties(extraProps);
-            }
-            
-            if (!extraProps.has("trust_type") || !extraProps.getString("trust_type").equals("checkbox")) {
-                extraProps.put("trust_type", "checkbox");
-                habit.setExtraProperties(extraProps);
-                Log.d(TAG, "Updated trust_type to checkbox in extra properties");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating trust_type: " + e.getMessage());
-        }
+        // Minimum 10% if habit exists but not completed today
+        return Math.max(10, progress);
     }
     
-    private void setupLocationVerification(HabitViewHolder holder, Habit habit) {
-        Log.d(TAG, "Setting up location verification for habit: " + habit.getTitle());
+    /**
+     * Handle habit click based on verification method
+     */
+    private void handleHabitClick(Habit habit, HabitInteractionListener listener, Context context) {
+        String verificationMethod = habit.getVerificationMethod();
         
-        // Note: Container views don't exist in new simplified layouts
-        
-        // Set up the verify button for location verification
-        if (holder.verifyButton != null) {
-            if (habit.isCompleted()) {
-                holder.verifyButton.setText("Verified");
-                holder.verifyButton.setEnabled(false);
-            } else {
-                holder.verifyButton.setText("Verify Location");
-                holder.verifyButton.setEnabled(true);
-                
-                holder.verifyButton.setOnClickListener(v -> {
-                    Context context = contextRef.get();
-                    HabitInteractionListener listener = listenerRef.get();
-                    
-                    if (context != null && listener != null) {
-                        Intent intent = new Intent(context, LocationVerificationActivity.class);
-                        intent.putExtra(LocationVerificationActivity.EXTRA_HABIT_ID, habit.getHabitId());
-                        intent.putExtra(LocationVerificationActivity.EXTRA_HABIT_TITLE, habit.getTitle());
-                        intent.putExtra(LocationVerificationActivity.EXTRA_HABIT_DESCRIPTION, habit.getDescription());
-                        intent.putExtra(LocationVerificationActivity.EXTRA_TARGET_LATITUDE, habit.getLatitude());
-                        intent.putExtra(LocationVerificationActivity.EXTRA_TARGET_LONGITUDE, habit.getLongitude());
-
-                        if (context instanceof android.app.Activity) {
-                            ((android.app.Activity) context).startActivityForResult(intent, LOCATION_VERIFICATION_ACTIVITY_REQUEST_CODE);
-                        } else {
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                        }
-                    }
-                });
-            }
-        }
-        
-        if (holder.habitIcon != null) {
-            holder.habitIcon.setImageResource(R.drawable.ic_location);
-            holder.habitIcon.setScaleX(1.0f); 
-            holder.habitIcon.setScaleY(1.0f);
-        }
-        
-        // Ensure the verification method is saved correctly
-        try {
-            JSONObject extraProps = habit.getExtraProperties();
-            if (extraProps == null) {
-                extraProps = new JSONObject();
-                habit.setExtraProperties(extraProps);
-            }
-            
-            if (!extraProps.has("trust_type") || 
-                (!extraProps.getString("trust_type").equals("location") && 
-                 !extraProps.getString("trust_type").equals("map"))) {
-                extraProps.put("trust_type", "map"); // Use backend enum value
-                habit.setExtraProperties(extraProps);
-                Log.d(TAG, "Updated trust_type to map in extra properties");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating trust_type: " + e.getMessage());
-        }
-        
-        if (holder.habitCard != null) {
-                holder.habitCard.setCardBackgroundColor(Color.parseColor("#F4DE00"));
-            }
-    }
-    
-    private void setupPomodoroVerification(HabitViewHolder holder, Habit habit) {
-        Log.d(TAG, "Setting up pomodoro verification for habit: " + habit.getTitle());
-        
-        // Note: Container views don't exist in new simplified layouts
-        
-        String habitId = habit.getHabitId();
-        
-        // Note: Pomodoro-specific views like progress bars and timers don't exist in the new layout
-        // The new layout only has basic title, description, icon, and verify button
-        
-        // Set up the verify button for pomodoro verification
-        if (holder.verifyButton != null) {
-            boolean isActive = activePomodoros.containsKey(habitId) && activePomodoros.get(habitId);
-            
-            if (habit.isCompleted()) {
-                holder.verifyButton.setText("Completed");
-                holder.verifyButton.setEnabled(false);
-            } else if (isActive) {
-                holder.verifyButton.setText("In Progress...");
-                holder.verifyButton.setEnabled(false);
-            } else {
-                holder.verifyButton.setText("Start Pomodoro");
-                holder.verifyButton.setEnabled(true);
-                
-                holder.verifyButton.setOnClickListener(v -> {
-                    Context context = contextRef.get();
-                    HabitInteractionListener listener = listenerRef.get();
-                    
-                    if (context != null && listener != null) {
-                        listener.onPomodoroStartClicked(habit.getHabitId());
-                        
-                        Intent intent = new Intent(context, PomodoroActivity.class);
-                        intent.putExtra(PomodoroActivity.EXTRA_HABIT_ID, habit.getHabitId());
-                        intent.putExtra(PomodoroActivity.EXTRA_POMODORO_LENGTH_MIN, habit.getPomodoroLength());
-                        
-                        if (context instanceof android.app.Activity) {
-                            ((android.app.Activity) context).startActivityForResult(
-                                    intent, POMODORO_ACTIVITY_REQUEST_CODE);
-                        } else {
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                        }
-                    }
-                });
-            }
-        }
-        
-        if (holder.habitIcon != null) {
-            holder.habitIcon.setImageResource(R.drawable.ic_timer);
-        }
-        
-        // Ensure the verification method is saved correctly
-        try {
-            JSONObject extraProps = habit.getExtraProperties();
-            if (extraProps == null) {
-                extraProps = new JSONObject();
-                habit.setExtraProperties(extraProps);
-            }
-            
-            if (!extraProps.has("trust_type") || !extraProps.getString("trust_type").equals("pomodoro")) {
-                extraProps.put("trust_type", "pomodoro");
-                habit.setExtraProperties(extraProps);
-                Log.d(TAG, "Updated trust_type to pomodoro in extra properties");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating trust_type: " + e.getMessage());
+        switch (verificationMethod) {
+            case Habit.VERIFICATION_LOCATION:
+                listener.onLocationVerifyClicked(habit.getHabitId());
+                break;
+            case Habit.VERIFICATION_POMODORO:
+                listener.onPomodoroStartClicked(habit.getHabitId());
+                break;
+            case Habit.VERIFICATION_CHECKBOX:
+            default:
+                // Toggle checkbox state
+                listener.onHabitChecked(habit.getHabitId(), !habit.isCompleted());
+                break;
         }
     }
-    
-    // Note: These methods were removed as the new simplified layouts 
-    // don't have complex pomodoro UI elements like timers and progress bars
     
     @Override
     public int getItemCount() {
-        return habitList.size();
+        return habitList != null ? habitList.size() : 0;
+    }
+    
+    /**
+     * Update the habit list
+     */
+    public void updateHabits(List<Habit> newHabits) {
+        this.habitList = newHabits != null ? newHabits : new ArrayList<>();
+        notifyDataSetChanged();
     }
     
     public void updatePomodoroStatus(String habitId, long timeRemaining, int completedCount, int totalCount) {
@@ -457,115 +426,61 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.HabitViewHol
     public class HabitViewHolder extends RecyclerView.ViewHolder {
         public CardView habitCard;
         public TextView titleTextView;
-        public TextView descriptionTextView;
+        public ProgressBar habitProgress;
+        public TextView percentageTextView;
+        public TextView streakTextView;
         public ImageView habitIcon;
-        public Button verifyButton;
+        public CheckBox habitCheckbox;
+        
+        // Check type specific views
+        public Button btnMarkComplete;
+        
+        // Pomodoro type specific views
+        public TextView pomodoroTime;
+        public TextView pomodoroStatus;
+        public Button btnStartPomodoro;
+        
+        // Location type specific views
+        public TextView locationName;
+        public TextView locationDistance;
+        public Button btnVerifyLocation;
         
         // Store the view type for this holder
         private int viewType;
-        
-        // Legacy views that don't exist in new layouts (keeping for compatibility)
-        public View checkboxContainer;
-        public View locationContainer;
-        public View pomodoroContainer;
-        public TextView locationVerificationTitle;
-        public TextView locationVerificationDescription;
-        public ImageView locationVerificationIcon;
-        public Button verifyLocationButton;
-        public TextView pomodoroInfoText;
-        public TextView pomodoroTimerText;
-        public ProgressBar pomodoroProgressBar;
-        public Button startPomodoroButton;
-        public Button pausePomodoroButton;
-        public Button resumePomodoroButton;
-        public Button stopPomodoroButton;
         
         public HabitViewHolder(@NonNull View itemView, int viewType) {
             super(itemView);
             this.viewType = viewType;
             
-            // Find common views that exist in all layouts
+            // Common views
             habitCard = itemView.findViewById(R.id.habit_card);
-            if (habitCard == null) {
-                // CardView is the root in the new layouts
+            if (habitCard == null && itemView instanceof CardView) {
                 habitCard = (CardView) itemView;
             }
             
-            // Find views specific to each verification type
+            titleTextView = itemView.findViewById(R.id.habit_title);
+            habitProgress = itemView.findViewById(R.id.habit_progress);
+            percentageTextView = itemView.findViewById(R.id.habit_percentage);
+            streakTextView = itemView.findViewById(R.id.habit_streak);
+            habitIcon = itemView.findViewById(R.id.habit_icon);
+            habitCheckbox = itemView.findViewById(R.id.habit_checkbox);
+            
+            // Type-specific views
             switch (viewType) {
                 case VIEW_TYPE_CHECKBOX:
-                    setupCheckboxViews(itemView);
-                    break;
-                case VIEW_TYPE_LOCATION:
-                    setupLocationViews(itemView);
+                    btnMarkComplete = itemView.findViewById(R.id.btn_mark_complete);
                     break;
                 case VIEW_TYPE_POMODORO:
-                    setupPomodoroViews(itemView);
+                    pomodoroTime = itemView.findViewById(R.id.pomodoro_time);
+                    pomodoroStatus = itemView.findViewById(R.id.pomodoro_status);
+                    btnStartPomodoro = itemView.findViewById(R.id.btn_start_pomodoro);
+                    break;
+                case VIEW_TYPE_LOCATION:
+                    locationName = itemView.findViewById(R.id.location_name);
+                    locationDistance = itemView.findViewById(R.id.location_distance);
+                    btnVerifyLocation = itemView.findViewById(R.id.btn_verify_location);
                     break;
             }
-        }
-        
-        private void setupCheckboxViews(View itemView) {
-            habitIcon = itemView.findViewById(R.id.checkbox_icon);
-            titleTextView = itemView.findViewById(R.id.checkbox_verification_title);
-            descriptionTextView = itemView.findViewById(R.id.checkbox_verification_description);
-            verifyButton = itemView.findViewById(R.id.verify_checkbox_button);
-        }
-        
-        private void setupLocationViews(View itemView) {
-            habitIcon = itemView.findViewById(R.id.location_icon);
-            titleTextView = itemView.findViewById(R.id.location_verification_title);
-            descriptionTextView = itemView.findViewById(R.id.location_verification_description);
-            verifyButton = itemView.findViewById(R.id.verify_location_button);
-        }
-        
-        private void setupPomodoroViews(View itemView) {
-            habitIcon = itemView.findViewById(R.id.pomodoro_icon);
-            titleTextView = itemView.findViewById(R.id.pomodoro_verification_title);
-            descriptionTextView = itemView.findViewById(R.id.pomodoro_verification_description);
-            verifyButton = itemView.findViewById(R.id.verify_pomodoro_button);
-        }
-        
-        public void bind(Habit habit) {
-            // Set basic habit info
-            titleTextView.setText(habit.getTitle());
-            
-            if (descriptionTextView != null) {
-                descriptionTextView.setText(habit.getDescription());
-                descriptionTextView.setVisibility(habit.getDescription() != null && !habit.getDescription().isEmpty() 
-                        ? View.VISIBLE : View.GONE);
-            }
-
-            // Note: Streak and progress views are not available in the new simplified layouts
-            // These features will be handled differently in the new design
-
-            // Set icon based on verification method
-            if (habitIcon != null) {
-                int iconRes;
-                switch (habit.getVerificationMethod()) {
-                    case Habit.VERIFICATION_LOCATION:
-                        iconRes = R.drawable.ic_location;
-                        break;
-                    case Habit.VERIFICATION_POMODORO:
-                        iconRes = R.drawable.ic_timer;
-                        break;
-                    case Habit.VERIFICATION_CHECKBOX:
-                    default:
-                        iconRes = R.drawable.ic_check;
-                        break;
-                }
-                habitIcon.setImageResource(iconRes);
-            }
-
-            // Set card color to habit yellow
-            if (habitCard != null) {
-                Context context = habitCard.getContext();
-                int cardColor = context.getResources().getColor(habit.isCompleted() ? 
-                        R.color.habit_dark_color : R.color.habit_color);
-                habitCard.setCardBackgroundColor(cardColor);
-            }
-
-            // Verification method-specific UI is handled in onBindViewHolder
         }
     }
 }

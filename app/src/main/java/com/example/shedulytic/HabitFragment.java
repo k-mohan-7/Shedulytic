@@ -60,8 +60,10 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
     private HabitAdapter habitAdapter;
     private TextView daysCountTextView;
     private TextView emptyStateText;
-    private Button addHabitButton;
+    private View addHabitButton; // Changed to View to support both Button and FAB
     private SwipeRefreshLayout swipeRefresh; // Added for optimized scrolling
+    private TextView pendingCountText;
+    private TextView completedCountText;
     
     // Data
     private List<Habit> habitList = new ArrayList<>();
@@ -87,6 +89,8 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
         emptyStateText = view.findViewById(R.id.empty_habits_text);
         addHabitButton = view.findViewById(R.id.add_habit_button);
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
+        pendingCountText = view.findViewById(R.id.pending_count);
+        completedCountText = view.findViewById(R.id.completed_count);
 
         // Initialize SwipeRefreshLayout with optimizations
         if (swipeRefresh != null) {
@@ -481,8 +485,13 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
             habit.setVerificationMethod(Habit.VERIFICATION_CHECKBOX);
         }
         
-        // Parse other fields
-        habit.setCompleted(habitObj.optInt("completed", 0) == 1);
+        // Parse other fields - check completed_today first (from server), fallback to completed
+        int completedToday = habitObj.optInt("completed_today", -1);
+        if (completedToday >= 0) {
+            habit.setCompleted(completedToday == 1);
+        } else {
+            habit.setCompleted(habitObj.optInt("completed", 0) == 1);
+        }
         habit.setCurrentStreak(habitObj.optInt("current_streak", 0));
         habit.setTotalCompletions(habitObj.optInt("total_completions", 0));
         habit.setFrequency(habitObj.optString("frequency", "daily"));
@@ -607,8 +616,48 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
      */
     private void updateEmptyState() {
         if (emptyStateText != null) {
-            emptyStateText.setVisibility(habitList.isEmpty() ? View.VISIBLE : View.GONE);
-            recyclerView.setVisibility(habitList.isEmpty() ? View.GONE : View.VISIBLE);
+            View emptyStateContainer = emptyStateText.getParent() instanceof View ? 
+                (View) emptyStateText.getParent() : null;
+            
+            if (habitList.isEmpty()) {
+                if (emptyStateContainer != null) {
+                    emptyStateContainer.setVisibility(View.VISIBLE);
+                }
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                if (emptyStateContainer != null) {
+                    emptyStateContainer.setVisibility(View.GONE);
+                }
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+        
+        // Update pending/completed counts
+        updateHabitCounts();
+    }
+    
+    /**
+     * Update pending and completed habit counts
+     */
+    private void updateHabitCounts() {
+        if (habitList == null) return;
+        
+        int pendingCount = 0;
+        int completedCount = 0;
+        
+        for (Habit habit : habitList) {
+            if (habit.isCompleted()) {
+                completedCount++;
+            } else {
+                pendingCount++;
+            }
+        }
+        
+        if (pendingCountText != null) {
+            pendingCountText.setText(String.valueOf(pendingCount));
+        }
+        if (completedCountText != null) {
+            completedCountText.setText(String.valueOf(completedCount));
         }
     }
     
@@ -1004,8 +1053,46 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
     
     @Override
     public void onHabitChecked(String habitId, boolean isChecked) {
-        // Verify the habit using checkbox method
-        habitManager.verifyHabitWithCheckbox(habitId, isChecked);
+        // Show confirmation dialog before marking as complete
+        Habit habit = habitManager.getHabit(habitId);
+        if (habit == null) {
+            Toast.makeText(getContext(), "Habit not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        if (isChecked && !habit.isCompleted()) {
+            // Show confirmation dialog
+            showMarkCompleteDialog(habit);
+        } else if (!isChecked && habit.isCompleted()) {
+            // Mark as incomplete
+            habitManager.verifyHabitWithCheckbox(habitId, false);
+            Toast.makeText(getContext(), "Habit marked as incomplete", Toast.LENGTH_SHORT).show();
+            updateHabitCounts();
+        }
+    }
+    
+    /**
+     * Show dialog to confirm marking habit as complete
+     */
+    private void showMarkCompleteDialog(Habit habit) {
+        if (getContext() == null) return;
+        
+        new AlertDialog.Builder(getContext())
+            .setTitle("Complete Habit")
+            .setMessage("Mark \"" + habit.getTitle() + "\" as completed for today?")
+            .setPositiveButton("Complete", (dialog, which) -> {
+                // Mark as complete
+                habitManager.verifyHabitWithCheckbox(habit.getHabitId(), true);
+                Toast.makeText(getContext(), "🎉 " + habit.getTitle() + " completed!", Toast.LENGTH_SHORT).show();
+                
+                // Refresh the list to show updated state
+                if (habitAdapter != null) {
+                    habitAdapter.notifyDataSetChanged();
+                }
+                updateHabitCounts();
+            })
+            .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+            .show();
     }
     
     @Override
@@ -1027,14 +1114,19 @@ public class HabitFragment extends Fragment implements HabitManagerService.Habit
     
     @Override
     public void onPomodoroStartClicked(String habitId) {
-        if (pomodoroService != null) {
-            Habit habit = habitManager.getHabit(habitId);
-            if (habit != null) {
-                // Launch the pomodoro activity
-                Intent intent = new Intent(getContext(), PomodoroActivity.class);
-                intent.putExtra("habit_id", habitId);
-                startActivity(intent);
-            }
+        Habit habit = habitManager.getHabit(habitId);
+        if (habit != null && getContext() != null) {
+            // Launch the pomodoro activity
+            Intent intent = new Intent(getContext(), PomodoroActivity.class);
+            intent.putExtra(PomodoroActivity.EXTRA_HABIT_ID, habitId);
+            intent.putExtra("habit_title", habit.getTitle());
+            // Get duration from habit - use getPomodoroLength() which defaults to 25
+            int duration = habit.getPomodoroLength();
+            if (duration <= 0) duration = 25; // Fallback to default
+            intent.putExtra(PomodoroActivity.EXTRA_POMODORO_LENGTH_MIN, duration);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getContext(), "Habit not found", Toast.LENGTH_SHORT).show();
         }
     }
     

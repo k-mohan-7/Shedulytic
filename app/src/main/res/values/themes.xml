@@ -12,6 +12,20 @@
 
     <style name="Theme.Shedulytic" parent="Base.Theme.Shedulytic" />
     
+    <!-- Transparent theme for popup activities like RewardPopup and SnoozePicker -->
+    <style name="Theme.Shedulytic.Transparent" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    
     <!-- Custom theme for dark green verification buttons -->
     <style name="Theme.DarkGreenButton" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">#2E7D32</item>

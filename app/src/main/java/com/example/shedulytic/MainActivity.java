@@ -26,6 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private static final String PREFS_NAME = "UserPrefs";
+    private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_ONBOARDING_COMPLETED = "onboarding_completed";
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,15 +42,46 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.splash_screen);
 
-        // Initialize the HabitManager to track user login streaks
-        initializeStreakTracking();
+        // Check login status and handle navigation
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String userId = prefs.getString(KEY_USER_ID, "");
+        boolean isLoggedIn = prefs.getBoolean(KEY_IS_LOGGED_IN, false);
+        boolean onboardingCompleted = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false);
+        
+        Log.d(TAG, "Checking login status - userId: " + userId + ", isLoggedIn: " + isLoggedIn + ", onboardingCompleted: " + onboardingCompleted);
 
-        // Simulate a splash screen delay (e.g., 3 seconds)
-        new Handler().postDelayed(() -> {
-            Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-            startActivity(intent);
-            finish();
-        }, 3000); // 3000 milliseconds = 3 seconds
+        // If user is already logged in, go directly to main app
+        if (isLoggedIn && userId != null && !userId.isEmpty()) {
+            Log.d(TAG, "User already logged in, going to MainNavigationActivity");
+            // Initialize streak tracking for logged-in user
+            initializeStreakTracking();
+            // Log user activity for today
+            logUserActivity();
+            
+            // Navigate to main app after splash delay
+            new Handler().postDelayed(() -> {
+                Intent intent = new Intent(MainActivity.this, MainNavigationActivity.class);
+                intent.putExtra("user_id", userId);
+                startActivity(intent);
+                finish();
+            }, 2000); // Shorter delay for returning users
+        } else if (onboardingCompleted) {
+            // Onboarding completed but not logged in - go to login
+            Log.d(TAG, "Onboarding completed, going to LoginActivity");
+            new Handler().postDelayed(() -> {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }, 2000);
+        } else {
+            // First time user - show onboarding
+            Log.d(TAG, "First time user, showing onboarding");
+            new Handler().postDelayed(() -> {
+                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                startActivity(intent);
+                finish();
+            }, 3000);
+        }
     }
 
     @Override
@@ -57,15 +94,17 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences userPrefs = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userId = userPrefs.getString("user_id", "");
         if (!userId.isEmpty()) {
-            String url = IpV4Connection.getBaseUrl() + "/log_user_activity.php";
+            // Use the new update_user_activity.php endpoint that properly updates streak
+            String url = IpV4Connection.getBaseUrl() + "/update_user_activity.php";
             
             StringRequest request = new StringRequest(Request.Method.POST, url,
                 response -> {
                     try {
                         JSONObject jsonResponse = new JSONObject(response);
                         if (jsonResponse.getString("status").equals("success")) {
-                            // Activity logged successfully
-                            Log.d("MainActivity", "User activity logged");
+                            // Activity logged and streak updated successfully
+                            int currentStreak = jsonResponse.optInt("streak_count", 0);
+                            Log.d("MainActivity", "User activity logged. Current streak: " + currentStreak);
                         }
                     } catch (JSONException e) {
                         Log.e("MainActivity", "Error parsing activity log response: " + e.getMessage());
@@ -77,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put("user_id", userId);
+                    params.put("activity_type", "login");
                     return params;
                 }
             };

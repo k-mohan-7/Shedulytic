@@ -90,7 +90,7 @@ public class NetworkUtils {
         
         // Try all possible URLs to ensure we can connect to at least one
         String[] urlsToTry = {
-            "http://10.34.179.64/schedlytic/",
+            IpV4Connection.getBaseUrl(),  // Use centralized IP configuration
             "http://localhost/schedlytic/",
             "http://10.0.2.2/schedlytic/"
         };

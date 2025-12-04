@@ -572,6 +572,10 @@ public class AddTaskActivity extends AppCompatActivity {
                 public void onTaskAdded(Task task) {
                     // Update UI on the main thread with success
                     mainHandler.post(() -> {
+                        // Note: Reminder notifications are now scheduled by TaskManager
+                        // No need to schedule here to avoid duplicate notifications
+                        Log.d("AddTaskActivity", "Task added, notifications scheduled by TaskManager");
+                        
                         // Show success message
                         TextView successMessage = findViewById(R.id.success_message);
                         if (successMessage != null) {

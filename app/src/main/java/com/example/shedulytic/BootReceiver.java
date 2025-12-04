@@ -38,12 +38,18 @@ public class BootReceiver extends BroadcastReceiver {
                     @Override
                     public void onTasksLoaded(java.util.List<Task> tasks) {
                         NotificationHandler notificationHandler = new NotificationHandler(context);
+                        ReminderNotificationManager reminderManager = new ReminderNotificationManager(context);
                         int rescheduledCount = 0;
                         
                         for (Task task : tasks) {
                             // Only reschedule incomplete tasks for today and future dates
                             if (!task.isCompleted() && isTaskRelevant(task)) {
-                                notificationHandler.scheduleTaskNotification(task);
+                                // Use appropriate notification manager based on task type
+                                if (task.isRemainder()) {
+                                    reminderManager.scheduleReminderNotifications(task);
+                                } else {
+                                    notificationHandler.scheduleTaskNotification(task);
+                                }
                                 rescheduledCount++;
                             }
                         }

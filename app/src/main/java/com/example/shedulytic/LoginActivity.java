@@ -57,12 +57,10 @@ public class LoginActivity extends AppCompatActivity {
         new Thread(() -> {
             HttpURLConnection conn = null;
             try {
-                // Try multiple server URLs in sequence
+                // Try multiple server URLs in sequence - primary IP should match IpV4Connection
                 String[] serverUrls = {
-                    "http://10.34.179.64/schedlytic/",
+                    IpV4Connection.getBaseUrl(),  // Use centralized IP configuration
                     "http://10.0.2.2/schedlytic/",
-                    "http://10.0.2.2:80/schedlytic/",
-                    "http://127.0.0.1/schedlytic/",
                     "http://localhost/schedlytic/"
                 };
                 
@@ -136,6 +134,10 @@ public class LoginActivity extends AppCompatActivity {
                                 SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.putString("user_id", userId);
+                                
+                                // Mark user as logged in for persistent login
+                                editor.putBoolean("is_logged_in", true);
+                                editor.putBoolean("onboarding_completed", true);
 
                                 // Get username from response with better fallback handling
                                 String username = "";
@@ -164,6 +166,9 @@ public class LoginActivity extends AppCompatActivity {
 
                                 // Commit all changes at once
                                 editor.commit();
+                                
+                                // Log user activity for streak tracking
+                                logUserActivityForStreak(userId);
 
                                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(LoginActivity.this, MainNavigationActivity.class);
@@ -196,6 +201,43 @@ public class LoginActivity extends AppCompatActivity {
                 if (conn != null) {
                     conn.disconnect();
                 }
+            }
+        }).start();
+    }
+    
+    /**
+     * Log user activity for streak tracking when user logs in
+     */
+    private void logUserActivityForStreak(String userId) {
+        new Thread(() -> {
+            try {
+                String baseUrl = IpV4Connection.getBaseUrl();
+                // Ensure proper URL construction with / separator
+                String endpoint = baseUrl.endsWith("/") ? baseUrl + "update_user_activity.php" : baseUrl + "/update_user_activity.php";
+                URL url = new URL(endpoint);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+                conn.setDoOutput(true);
+                
+                // Send POST data
+                String postData = "user_id=" + userId + "&activity_type=login";
+                conn.getOutputStream().write(postData.getBytes("UTF-8"));
+                
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    Scanner scanner = new Scanner(conn.getInputStream(), "UTF-8");
+                    StringBuilder response = new StringBuilder();
+                    while (scanner.hasNextLine()) {
+                        response.append(scanner.nextLine());
+                    }
+                    scanner.close();
+                    Log.d(TAG, "Activity logged for streak: " + response.toString());
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e(TAG, "Error logging activity for streak: " + e.getMessage());
             }
         }).start();
     }

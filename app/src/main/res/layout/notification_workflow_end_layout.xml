@@ -65,22 +65,34 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:text="✅ Completed"
+            android:text="✅ Done"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:background="#4CAF50"
-            android:layout_marginEnd="4dp" />
+            android:layout_marginEnd="2dp" />
+
+        <Button
+            android:id="@+id/button_center"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="⏰ Extend"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:background="#2196F3"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp" />
 
         <Button
             android:id="@+id/button_right"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_weight="1"
-            android:text="⏱️ Extend Time"
+            android:text="❌ Can't"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:background="#2196F3"
-            android:layout_marginStart="4dp" />
+            android:textSize="11sp"
+            android:background="#F44336"
+            android:layout_marginStart="2dp" />
 
     </LinearLayout>
 

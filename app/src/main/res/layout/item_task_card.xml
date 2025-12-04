@@ -2,147 +2,174 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/taskCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardBackgroundColor="@color/white"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="6dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/divider_color"
+    app:cardElevation="6dp"
     app:strokeWidth="0dp">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/taskCardBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:background="@drawable/gradient_default_card">
 
-        <!-- Task Type Indicator -->
-        <View
-            android:id="@+id/taskTypeIndicator"
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/bg_rounded_indicator"
-            tools:background="@color/reminder_primary" />
-
-        <!-- Task Content -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
-            <!-- Task Title -->
-            <TextView
-                android:id="@+id/tvTaskTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Task Title"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            <!-- Task Type Indicator Circle -->
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp">
 
-            <!-- Task Description (optional) -->
-            <TextView
-                android:id="@+id/tvTaskDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Task description goes here"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:visibility="gone" />
+                <View
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/icon_circle_glass" />
 
-            <!-- Task Meta Row -->
+                <ImageView
+                    android:id="@+id/ivTaskIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_remainder"
+                    app:tint="#FFFFFF" />
+            </FrameLayout>
+
+            <!-- Task Content -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
 
-                <!-- Task Type Badge -->
-                <TextView
-                    android:id="@+id/tvTaskType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_task_type_badge"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
-                    android:text="Reminder"
-                    android:textColor="@color/reminder_primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <!-- Time -->
+                <!-- Title Row with Type Badge -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_time"
-                        app:tint="@color/text_hint" />
-
                     <TextView
-                        android:id="@+id/tvTaskTime"
+                        android:id="@+id/tvTaskTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:text="Task Title"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.02" />
+
+                    <!-- Task Type Badge -->
+                    <TextView
+                        android:id="@+id/tvTaskType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="10:00 AM"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/task_type_badge_glass"
+                        android:letterSpacing="0.05"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="Reminder"
+                        android:textAllCaps="true"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Priority (if applicable) -->
-                <LinearLayout
-                    android:id="@+id/priorityContainer"
-                    android:layout_width="wrap_content"
+                <!-- Task Description (optional) -->
+                <TextView
+                    android:id="@+id/tvTaskDescription"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="Task description goes here"
+                    android:textColor="#C8C8C8"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
+
+                <!-- Task Meta Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/ivPriority"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_priority"
-                        app:tint="@color/error" />
-
-                    <TextView
-                        android:id="@+id/tvPriority"
+                    <!-- Time Badge -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="High"
-                        android:textColor="@color/error"
-                        android:textSize="12sp" />
+                        android:background="@drawable/task_time_badge_glass"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp">
 
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_time"
+                            app:tint="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvTaskTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="10:00 AM"
+                            android:textColor="#E8E8E8"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Priority (if applicable) -->
+                    <LinearLayout
+                        android:id="@+id/priorityContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/task_time_badge_glass"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/ivPriority"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_priority"
+                            app:tint="#FF6B6B" />
+
+                        <TextView
+                            android:id="@+id/tvPriority"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="High"
+                            android:textColor="#FF6B6B"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <!-- Checkbox / Complete Button -->
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="12dp">
-
+            <!-- Checkbox / Complete Button -->
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbTaskComplete"
                 android:layout_width="wrap_content"
@@ -150,8 +177,15 @@
                 android:button="@drawable/checkbox_selector"
                 android:checked="false" />
 
-        </FrameLayout>
+        </LinearLayout>
 
-    </LinearLayout>
+        <!-- Hidden indicator for type color reference -->
+        <View
+            android:id="@+id/taskTypeIndicator"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </com.google.android.material.card.MaterialCardView>

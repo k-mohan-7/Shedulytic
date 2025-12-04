@@ -1,248 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Simple horizontal habit item: Name | Progress Bar | Percentage -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/habit_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="6dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
-    android:id="@+id/habit_card"
-    android:layerType="hardware">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/habitItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:background="@color/white">
 
-        <!-- Left side: Icon -->
-        <ImageView
-            android:id="@+id/habit_icon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="center_vertical"
-            android:contentDescription="Habit Icon"
-            android:tint="#FFFFFF" />
-
-        <!-- Main content -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:gravity="center_vertical">
 
-            <!-- Title -->
+            <!-- Habit Icon (hidden by default, can be shown) -->
+            <ImageView
+                android:id="@+id/habit_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Habit Icon"
+                android:visibility="gone"
+                app:tint="@color/dark_black" />
+
+            <!-- Habit Name -->
             <TextView
                 android:id="@+id/habit_title"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
+                android:layout_weight="0.35"
+                android:textColor="@color/dark_black"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:ellipsize="end"
-                android:maxLines="1" />
+                android:maxLines="1"
+                tools:text="Gym" />
 
-            <!-- Description -->
+            <!-- Progress Bar Container (like the reference image: gray bg, red progress) -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:layout_marginHorizontal="12dp">
+
+                <ProgressBar
+                    android:id="@+id/habit_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/habit_progress_bar_style"
+                    tools:progress="73" />
+            </FrameLayout>
+
+            <!-- Percentage Text -->
             <TextView
-                android:id="@+id/habit_description"
-                android:layout_width="wrap_content"
+                android:id="@+id/habit_percentage"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="#F0F0F0"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:visibility="gone" />            <!-- Streak info -->
-            <TextView
-                android:id="@+id/habit_streak"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp" />
+                android:layout_weight="0.15"
+                android:gravity="end"
+                android:textColor="@color/dark_black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="73%" />
 
-            <!-- Progress bar -->
-            <ProgressBar
-                android:id="@+id/habit_progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_marginTop="8dp"
+            <!-- Hidden checkbox for completion logic -->
+            <CheckBox
+                android:id="@+id/habit_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:visibility="gone" />
-
-            <!-- Location info -->
-            <TextView
-                android:id="@+id/location_info_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"
-                android:visibility="gone" />
-
-            <!-- Pomodoro info -->
-            <TextView
-                android:id="@+id/pomodoro_info_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"
-                android:visibility="gone" />
-
-            <!-- Pomodoro timer text -->
-            <TextView
-                android:id="@+id/pomodoro_timer_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E0E0E0"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:visibility="gone" />
-
-            <!-- Pomodoro progress bar -->
-            <ProgressBar
-                android:id="@+id/pomodoro_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_marginTop="4dp"
-                android:visibility="gone" />
-
-            <!-- Pomodoro control buttons -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-
-                <Button
-                    android:id="@+id/start_pomodoro_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:text="Start"
-                    android:textSize="10sp"
-                    android:layout_marginEnd="4dp" />
-
-                <Button
-                    android:id="@+id/pause_pomodoro_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:text="Pause"
-                    android:textSize="10sp"
-                    android:layout_marginEnd="4dp"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/resume_pomodoro_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:text="Resume"
-                    android:textSize="10sp"
-                    android:layout_marginEnd="4dp"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/stop_pomodoro_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:text="Stop"
-                    android:textSize="10sp"                    android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- Verification containers -->
-            <LinearLayout
-                android:id="@+id/checkbox_verification_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-                <!-- Checkbox verification content will be added here programmatically -->
-            </LinearLayout>            <LinearLayout
-                android:id="@+id/location_verification_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-                
-                <TextView
-                    android:id="@+id/location_verification_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Location Verification"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-                
-                <TextView
-                    android:id="@+id/location_verification_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Verify your location to complete this habit"
-                    android:textColor="#E0E0E0"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
-                    
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-                    
-                    <ImageView
-                        android:id="@+id/location_icon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_location"
-                        android:layout_gravity="center_vertical"
-                        android:tint="#FFFFFF" />
-                        
-                    <Button
-                        android:id="@+id/verify_location_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="32dp"
-                        android:text="Verify Location"
-                        android:textSize="10sp"
-                        android:layout_marginStart="8dp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/pomodoro_verification_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-                <!-- Pomodoro verification content will be added here programmatically -->
-            </LinearLayout>
         </LinearLayout>
+    </FrameLayout>
 
-        <!-- Right side: Habit Type -->
+    <!-- Hidden fields for compatibility with existing adapter -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone">
+
         <TextView
             android:id="@+id/habit_type"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:layout_marginStart="8dp"
-            android:textColor="#FFFFFF" />
-            
-        <!-- Checkbox for completion -->
-        <CheckBox
-            android:id="@+id/habit_checkbox"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/habit_description"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/habit_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/location_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/pomodoro_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/pomodoro_timer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/pomodoro_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/start_pomodoro_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/pause_pomodoro_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/resume_pomodoro_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/stop_pomodoro_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:id="@+id/checkbox_verification_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="4dp"
-            android:button="@drawable/custom_checkbox" />
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/location_verification_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/location_verification_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/location_verification_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/location_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+
+            <Button
+                android:id="@+id/verify_location_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/pomodoro_verification_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

@@ -52,7 +52,13 @@ public class CantCompleteTaskActivity extends Activity {
         setupClickListeners();
         
         // Dismiss the notification since user is handling it
-        notificationManager.cancel(Integer.parseInt(taskId));
+        int notificationId = getIntent().getIntExtra("notification_id", 0);
+        if (notificationId != 0) {
+            notificationManager.cancel(notificationId);
+        }
+        // Also cancel by task-based ID as fallback
+        notificationManager.cancel((taskId + "_exact").hashCode());
+        notificationManager.cancel((taskId + "_pre").hashCode());
     }
 
     private void initializeViews() {
@@ -192,10 +198,11 @@ public class CantCompleteTaskActivity extends Activity {
             updateTaskDateTime(newDateTime);
             
             // Schedule new notification
-            NotificationHandler notificationHandler = new NotificationHandler(this);
             Task rescheduledTask = createRescheduledTask(newDateTime);
-              // Schedule based on task type
+            
+            // Schedule based on task type - use appropriate notification manager
             if (isWorkflowTask()) {
+                NotificationHandler notificationHandler = new NotificationHandler(this);
                 notificationHandler.scheduleWorkflowNotifications(
                     rescheduledTask.getTaskId(),
                     rescheduledTask.getTitle(),
@@ -205,13 +212,9 @@ public class CantCompleteTaskActivity extends Activity {
                     rescheduledTask.getDueDate()
                 );
             } else {
-                notificationHandler.scheduleReminderNotification(
-                    rescheduledTask.getTaskId(),
-                    rescheduledTask.getTitle(),
-                    rescheduledTask.getDescription(),
-                    rescheduledTask.getStartTime(),
-                    rescheduledTask.getDueDate()
-                );
+                // Use ReminderNotificationManager for remainder tasks
+                ReminderNotificationManager reminderManager = new ReminderNotificationManager(this);
+                reminderManager.scheduleReminderNotifications(rescheduledTask);
             }
             
             Toast.makeText(this, 
@@ -228,12 +231,30 @@ public class CantCompleteTaskActivity extends Activity {
 
     private void handleSkipForToday() {
         try {
-            // Mark task as skipped for today
-            TaskManager taskManager = createTaskManager("Task skipped for today");
-            taskManager.updateTaskStatus(taskId, "skipped_today");
+            String taskTitle = getIntent().getStringExtra("task_title");
             
-            Toast.makeText(this, "Task skipped for today", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Task " + taskId + " skipped for today");
+            // Mark task as skipped and apply penalty using ReminderNotificationManager
+            ReminderNotificationManager reminderManager = new ReminderNotificationManager(this);
+            reminderManager.handleTaskCompletion(taskId, "skipped", new ReminderNotificationManager.TaskCompletionCallback() {
+                @Override
+                public void onSuccess(double xpChange) {
+                    // Show penalty popup
+                    Intent penaltyIntent = new Intent(CantCompleteTaskActivity.this, RewardPopupActivity.class);
+                    penaltyIntent.putExtra("xp_change", xpChange);
+                    penaltyIntent.putExtra("task_title", taskTitle != null ? taskTitle : "Task");
+                    penaltyIntent.putExtra("is_reward", false);
+                    startActivity(penaltyIntent);
+                    
+                    Toast.makeText(CantCompleteTaskActivity.this, "Task skipped for today", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Task " + taskId + " skipped with penalty: " + xpChange);
+                }
+                
+                @Override
+                public void onError(String message) {
+                    Log.e(TAG, "Error updating task status: " + message);
+                    Toast.makeText(CantCompleteTaskActivity.this, "Task skipped for today", Toast.LENGTH_SHORT).show();
+                }
+            });
             
         } catch (Exception e) {
             Log.e(TAG, "Error skipping task: " + e.getMessage());

@@ -88,6 +88,18 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
     private TextView currentDateTextView; // For header date display
     private ImageView profileImageView;
     private SwipeRefreshLayout swipeRefresh; // Added for explicit null check
+    
+    // Stats TextViews for real-time updates
+    private TextView statTasksCompletedTextView;
+    private TextView statWorkflowsCompletedTextView;
+    private TextView statHabitsCompletedTextView;
+    private int totalTasks = 0;
+    private int completedTasks = 0;
+    private int totalWorkflows = 0;
+    private int completedWorkflows = 0;
+    private int totalHabits = 0;
+    private int completedHabits = 0;
+    
     private String userId;
     private String username; // From SharedPreferences
     private Map<String, Boolean> weekStreakData = new HashMap<>();
@@ -176,6 +188,9 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                     }
                 }
                 
+                // Update stats immediately for real-time feedback
+                calculateAndUpdateStats();
+                
                 // Sort the tasks if the adapter is available
                 if (myDayTimelineRecycler != null && myDayTimelineRecycler.getAdapter() instanceof TaskAdapter) {
                     TaskAdapter adapter = (TaskAdapter) myDayTimelineRecycler.getAdapter();
@@ -236,6 +251,11 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         currentDateTextView = view.findViewById(R.id.text_current_date); // Header date
         profileImageView = view.findViewById(R.id.profileImage);
         swipeRefresh = view.findViewById(R.id.swipeRefresh); // Initialize swipeRefresh
+        
+        // Initialize stats TextViews for real-time updates
+        statTasksCompletedTextView = view.findViewById(R.id.stat_tasks_completed);
+        statWorkflowsCompletedTextView = view.findViewById(R.id.stat_workflows_completed);
+        statHabitsCompletedTextView = view.findViewById(R.id.stat_habits_completed);
         
         // Update header with current date
         updateHeaderDate();
@@ -436,21 +456,21 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                 Log.e(TAG, "Habit manager is null, cannot load habits");
             }
             
-            // Refresh profile and streak data only on manual refresh
+            // Always load streak data (not just on force refresh) to ensure UI is updated
+            // This ensures the streak chip shows correct value when fragment loads
+            if (activitiesManager != null) {
+                activitiesManager.loadStreakData();
+            } else {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(this::loadUserStreakData);
+                }
+            }
+            
+            // Refresh profile data only on manual refresh
             if (forceRefresh) {
-                        // Refresh profile data
-                        if (profileManager != null) {
-                            profileManager.loadUserProfile();
-                        }
-                        
-                        // Refresh streak data
-                        if (activitiesManager != null) {
-                            activitiesManager.loadStreakData();
-                        } else {
-                            if (getActivity() != null) {
-                                getActivity().runOnUiThread(this::loadUserStreakData);
-                            }
-                        }
+                if (profileManager != null) {
+                    profileManager.loadUserProfile();
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Error refreshing data: " + e.getMessage(), e);
@@ -737,6 +757,79 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         }
     }
 
+    /**
+     * Update the "Today so far" stats in real-time
+     * Call this method whenever tasks, workflows, or habits change
+     */
+    private void updateTodayStats() {
+        if (getActivity() == null || !isAdded()) return;
+        
+        getActivity().runOnUiThread(() -> {
+            // Update Tasks stat
+            if (statTasksCompletedTextView != null) {
+                statTasksCompletedTextView.setText(completedTasks + "/" + totalTasks);
+            }
+            
+            // Update Workflows stat
+            if (statWorkflowsCompletedTextView != null) {
+                statWorkflowsCompletedTextView.setText(completedWorkflows + "/" + totalWorkflows);
+            }
+            
+            // Update Habits stat
+            if (statHabitsCompletedTextView != null) {
+                statHabitsCompletedTextView.setText(completedHabits + "/" + totalHabits);
+            }
+            
+            Log.d(TAG, "Stats updated - Tasks: " + completedTasks + "/" + totalTasks + 
+                       ", Workflows: " + completedWorkflows + "/" + totalWorkflows + 
+                       ", Habits: " + completedHabits + "/" + totalHabits);
+        });
+    }
+
+    /**
+     * Calculate and update stats based on current data
+     */
+    private void calculateAndUpdateStats() {
+        // Reset counters
+        totalTasks = 0;
+        completedTasks = 0;
+        totalWorkflows = 0;
+        completedWorkflows = 0;
+        
+        // Count tasks and workflows from today's activities
+        if (todayActivities != null) {
+            for (TaskItem item : todayActivities) {
+                if (item != null) {
+                    String type = item.getType();
+                    boolean isCompleted = item.isCompleted();
+                    
+                    if ("workflow".equalsIgnoreCase(type)) {
+                        totalWorkflows++;
+                        if (isCompleted) completedWorkflows++;
+                    } else {
+                        // Count as task (reminder, task, etc.)
+                        totalTasks++;
+                        if (isCompleted) completedTasks++;
+                    }
+                }
+            }
+        }
+        
+        // Count habits
+        totalHabits = habitList != null ? habitList.size() : 0;
+        completedHabits = 0;
+        if (habitList != null) {
+            for (Habit habit : habitList) {
+                if (habit != null && habit.isCompleted()) {
+                    completedHabits++;
+                }
+            }
+        }
+        
+        // Update the UI
+        updateTodayStats();
+    }
+
     private void initializeCalendarViews(View view) {
         // Find the week calendar container (may be an include or direct)
         View weekCalendar = view.findViewById(R.id.week_calendar);
@@ -926,6 +1019,9 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
             Log.i(TAG, "No activities to display for today. Showing empty state.");
             displayEmptyTaskState();
         }
+        
+        // Update the "Today so far" stats with real-time counts
+        calculateAndUpdateStats();
         
         // Stop the refresh indicator
         if (swipeRefresh != null) swipeRefresh.setRefreshing(false); // Activities loaded (or empty state shown)
@@ -1205,9 +1301,23 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
             Log.d(TAG, "User profile loaded: " + name + ", streak: " + streakCount);
             
             // Update streak count if provided
-            if (streakCount >= 0 && streakCountTextView != null) {
+            if (streakCount >= 0) {
                 requireActivity().runOnUiThread(() -> {
-                    streakCountTextView.setText(String.valueOf(streakCount));
+                    // Update main streak count display
+                    if (streakCountTextView != null) {
+                        streakCountTextView.setText(String.valueOf(streakCount));
+                    }
+                    
+                    // Update top bar streak chip (text_streak_count)
+                    if (topStreakCountTextView != null) {
+                        topStreakCountTextView.setText(String.valueOf(streakCount));
+                        Log.d(TAG, "Updated top streak chip to: " + streakCount);
+                    }
+                    
+                    // Update fire icon visibility
+                    if (fireIconStreakImageView != null) {
+                        fireIconStreakImageView.setVisibility(streakCount > 0 ? View.VISIBLE : View.GONE);
+                    }
                     
                     // Save streak count to preferences
                     SharedPreferences prefs = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
@@ -1229,6 +1339,16 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                     username = name;
                 });
             }
+            
+            // Update XP/coins display from SharedPreferences (saved by TodayActivitiesManager)
+            requireActivity().runOnUiThread(() -> {
+                if (xpCountTextView != null) {
+                    SharedPreferences prefs = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+                    int xpCoins = prefs.getInt("xp_coins", 0);
+                    xpCountTextView.setText(String.valueOf(xpCoins));
+                    Log.d(TAG, "Updated XP/coins display to: " + xpCoins);
+                }
+            });
             
             // Update avatar if provided and view exists
             if (avatarUrl != null && !avatarUrl.isEmpty() && profileImageView != null) {
@@ -1506,6 +1626,9 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                 
                 updateHabitEmptyState();
                 
+                // Update the "Today so far" stats with real-time counts
+                calculateAndUpdateStats();
+                
                 // Hide refresh loading
                 if (swipeRefresh != null) {
                     swipeRefresh.setRefreshing(false);
@@ -1527,6 +1650,10 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                     habitAdapter.notifyItemInserted(habitList.size() - 1);
                 }
                 updateHabitEmptyState();
+                
+                // Update stats after adding habit
+                calculateAndUpdateStats();
+                
                 Log.d(TAG, "Habit added to home: " + habit.getTitle());
             } catch (Exception e) {
                 Log.e(TAG, "Error adding habit to UI: " + e.getMessage());
@@ -1550,6 +1677,8 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
                         break;
                     }
                 }
+                // Update stats after habit completion status change
+                calculateAndUpdateStats();
             } catch (Exception e) {
                 Log.e(TAG, "Error updating habit in UI: " + e.getMessage());
             }
@@ -1563,6 +1692,7 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
         getActivity().runOnUiThread(() -> {
             try {
                 onHabitUpdated(habit);
+                // Stats already updated by onHabitUpdated
                 Toast.makeText(getContext(), 
                     habit.getTitle() + " " + (isCompleted ? "completed" : "verification failed"), 
                     Toast.LENGTH_SHORT).show();
@@ -1721,9 +1851,21 @@ public class HomeFragment extends Fragment implements ProfileManager.ProfileLoad
     public void onPomodoroStartClicked(String habitId) {
         Log.d(TAG, "Pomodoro start clicked for habit: " + habitId);
         
-        // Start pomodoro verification for the habit
-        if (habitManager != null) {
-            habitManager.verifyHabitWithPomodoro(habitId);
+        // Launch the PomodoroActivity instead of directly marking complete
+        if (habitManager != null && getContext() != null) {
+            Habit habit = habitManager.getHabit(habitId);
+            if (habit != null) {
+                Intent intent = new Intent(getContext(), PomodoroActivity.class);
+                intent.putExtra(PomodoroActivity.EXTRA_HABIT_ID, habitId);
+                intent.putExtra("habit_title", habit.getTitle());
+                // Get duration from habit - use getPomodoroLength() which defaults to 25
+                int duration = habit.getPomodoroLength();
+                if (duration <= 0) duration = 25; // Fallback to default
+                intent.putExtra(PomodoroActivity.EXTRA_POMODORO_LENGTH_MIN, duration);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), "Habit not found", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

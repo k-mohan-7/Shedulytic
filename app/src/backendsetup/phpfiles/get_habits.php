@@ -12,7 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit;
     }
 
-    $sql = "SELECT * FROM habits WHERE user_id = :user_id";
+    // Get habits with today's completion status
+    $sql = "SELECT h.*, 
+            CASE WHEN hc.completion_date IS NOT NULL THEN 1 ELSE 0 END as completed_today
+            FROM habits h
+            LEFT JOIN habit_completions hc 
+                ON h.habit_id = hc.habit_id 
+                AND hc.user_id = h.user_id 
+                AND hc.completion_date = CURDATE()
+            WHERE h.user_id = :user_id";
+    
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':user_id' => $user_id]);
     $habits = $stmt->fetchAll(PDO::FETCH_ASSOC);

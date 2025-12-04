@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Calendar;
 
 public class TaskFragment extends Fragment implements TaskManager.TaskListener, TaskAdapter.TaskCheckListener {
     private static final String TAG = "TaskFragment";
@@ -40,9 +41,18 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
     private RecyclerView taskRecyclerView;
     private TaskAdapter taskAdapter;
     private List<Task> taskList = new ArrayList<>();
+    private List<Task> allTasksList = new ArrayList<>(); // Store all tasks for filtering
     private TextView emptyStateTextView;
     private String todayDate;
     private SwipeRefreshLayout swipeRefresh; // Added for optimized scrolling
+    
+    // Filter tabs
+    private TextView tabToday;
+    private TextView tabUpcoming;
+    private TextView tabPast;
+    private TextView tabAll;
+    private TextView timelineTitle;
+    private String currentFilter = "today"; // Default filter
 
     // Make sure we have the correct taskCheckListener implementation 
     private final TaskAdapter.TaskCheckListener taskCheckListener = this;
@@ -64,6 +74,16 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
         taskRecyclerView = view.findViewById(R.id.task_recycler_view);
         emptyStateTextView = view.findViewById(R.id.empty_state_text);
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
+        
+        // Initialize filter tabs
+        tabToday = view.findViewById(R.id.tab_today);
+        tabUpcoming = view.findViewById(R.id.tab_upcoming);
+        tabPast = view.findViewById(R.id.tab_past);
+        tabAll = view.findViewById(R.id.tab_all);
+        timelineTitle = view.findViewById(R.id.timeline_title);
+        
+        // Setup tab click listeners
+        setupTabListeners();
 
         // Initialize SwipeRefreshLayout with optimizations
         if (swipeRefresh != null) {
@@ -173,8 +193,8 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
         // Log task loading attempt
         Log.d(TAG, "Attempting to load tasks for date: " + todayDate + " with user ID: " + userId);
         
-        // Always use parallel loading for best performance
-        taskManager.loadTasks(todayDate);
+        // Load all tasks for filtering capability
+        taskManager.loadAllTasks();
         
         // As a fallback, also try to load from TodayActivitiesManager which has additional data sources
         if (getActivity() != null) {
@@ -281,57 +301,19 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
             }
         }
         
-        // Filter tasks to only include today's tasks
-        List<Task> todayTasks = new ArrayList<>();
+        // Store all tasks for filtering
+        allTasksList.clear();
         for (Task task : tasks) {
-            if (todayDate.equals(task.getDueDate())) {
-                // Make sure the task type is correct
-                String type = task.getType() != null ? task.getType().toLowerCase() : "";
-                if (!type.equals("workflow") && !type.equals("remainder")) {
-                    task.setTaskType("remainder"); // Default to remainder if type is invalid
-                    Log.d(TAG, "Fixed task type for: " + task.getTitle());
-                }
-                todayTasks.add(task);
-                Log.d(TAG, "Adding task: " + task.getTitle() + ", Type: " + task.getType());
+            // Make sure the task type is correct
+            String type = task.getType() != null ? task.getType().toLowerCase() : "";
+            if (!type.equals("workflow") && !type.equals("remainder")) {
+                task.setTaskType("remainder"); // Default to remainder if type is invalid
             }
+            allTasksList.add(task);
         }
         
-        // Compare current tasks with new tasks to avoid UI flicker
-        if (!todayTasks.isEmpty()) {
-            boolean hasChanges = taskList.size() != todayTasks.size();
-            if (!hasChanges) {
-                // Check if any tasks are different
-                Set<String> existingIds = new HashSet<>();
-                for (Task task : taskList) {
-                    existingIds.add(task.getTaskId());
-                }
-                
-                for (Task task : todayTasks) {
-                    if (!existingIds.contains(task.getTaskId())) {
-                        hasChanges = true;
-                        break;
-                    }
-                }
-            }
-            
-            // Only update if there are actually changes
-            if (hasChanges) {
-        taskList.clear();
-        taskList.addAll(todayTasks);
-        taskAdapter.notifyDataSetChanged();
-        updateTaskCounts();
-            }
-        }
-
-        // Show empty state message when no tasks are available
-        if (emptyStateTextView != null) {
-        if (taskList.isEmpty()) {
-                emptyStateTextView.setVisibility(View.VISIBLE);
-                emptyStateTextView.setText("No tasks available for today");
-        } else {
-                emptyStateTextView.setVisibility(View.GONE);
-            }
-        }
+        // Apply current filter
+        filterTasks();
     }
 
     @Override
@@ -692,5 +674,232 @@ public class TaskFragment extends Fragment implements TaskManager.TaskListener, 
      */
     public void refreshData() {
         refreshAllDataFast();
+    }
+    
+    /**
+     * Setup click listeners for filter tabs
+     */
+    private void setupTabListeners() {
+        if (tabToday != null) {
+            tabToday.setOnClickListener(v -> {
+                currentFilter = "today";
+                updateTabStyles();
+                filterTasks();
+                if (timelineTitle != null) {
+                    timelineTitle.setText("📅 Today's Timeline");
+                }
+            });
+        }
+        
+        if (tabUpcoming != null) {
+            tabUpcoming.setOnClickListener(v -> {
+                currentFilter = "upcoming";
+                updateTabStyles();
+                filterTasks();
+                if (timelineTitle != null) {
+                    timelineTitle.setText("🔜 Upcoming Tasks");
+                }
+            });
+        }
+        
+        if (tabPast != null) {
+            tabPast.setOnClickListener(v -> {
+                currentFilter = "past";
+                updateTabStyles();
+                filterTasks();
+                if (timelineTitle != null) {
+                    timelineTitle.setText("📜 Past Tasks");
+                }
+            });
+        }
+        
+        if (tabAll != null) {
+            tabAll.setOnClickListener(v -> {
+                currentFilter = "all";
+                updateTabStyles();
+                filterTasks();
+                if (timelineTitle != null) {
+                    timelineTitle.setText("📋 All Tasks");
+                }
+            });
+        }
+    }
+    
+    /**
+     * Update tab visual styles based on current selection
+     */
+    private void updateTabStyles() {
+        if (getContext() == null) return;
+        
+        // Reset all tabs to unselected state
+        if (tabToday != null) {
+            tabToday.setBackgroundResource(R.drawable.tab_unselected_background);
+            tabToday.setTextColor(getResources().getColor(R.color.darkGreen));
+            tabToday.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+        if (tabUpcoming != null) {
+            tabUpcoming.setBackgroundResource(R.drawable.tab_unselected_background);
+            tabUpcoming.setTextColor(getResources().getColor(R.color.darkGreen));
+            tabUpcoming.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+        if (tabPast != null) {
+            tabPast.setBackgroundResource(R.drawable.tab_unselected_background);
+            tabPast.setTextColor(getResources().getColor(R.color.darkGreen));
+            tabPast.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+        if (tabAll != null) {
+            tabAll.setBackgroundResource(R.drawable.tab_unselected_background);
+            tabAll.setTextColor(getResources().getColor(R.color.darkGreen));
+            tabAll.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+        
+        // Set selected tab style
+        TextView selectedTab = null;
+        switch (currentFilter) {
+            case "today":
+                selectedTab = tabToday;
+                break;
+            case "upcoming":
+                selectedTab = tabUpcoming;
+                break;
+            case "past":
+                selectedTab = tabPast;
+                break;
+            case "all":
+                selectedTab = tabAll;
+                break;
+        }
+        
+        if (selectedTab != null) {
+            selectedTab.setBackgroundResource(R.drawable.tab_selected_background);
+            selectedTab.setTextColor(getResources().getColor(R.color.white));
+            selectedTab.setTypeface(null, android.graphics.Typeface.BOLD);
+        }
+    }
+    
+    /**
+     * Filter tasks based on current filter selection
+     */
+    private void filterTasks() {
+        if (allTasksList.isEmpty()) {
+            // If no tasks stored yet, use current taskList as base
+            allTasksList.addAll(taskList);
+        }
+        
+        List<Task> filteredTasks = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String today = dateFormat.format(new Date());
+        
+        for (Task task : allTasksList) {
+            String taskDate = task.getDueDate();
+            if (taskDate == null) continue;
+            
+            switch (currentFilter) {
+                case "today":
+                    if (today.equals(taskDate)) {
+                        filteredTasks.add(task);
+                    }
+                    break;
+                case "upcoming":
+                    try {
+                        Date taskDateObj = dateFormat.parse(taskDate);
+                        Date todayDateObj = dateFormat.parse(today);
+                        if (taskDateObj != null && todayDateObj != null && taskDateObj.after(todayDateObj)) {
+                            filteredTasks.add(task);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Date parse error: " + e.getMessage());
+                    }
+                    break;
+                case "past":
+                    try {
+                        Date taskDateObj = dateFormat.parse(taskDate);
+                        Date todayDateObj = dateFormat.parse(today);
+                        if (taskDateObj != null && todayDateObj != null && taskDateObj.before(todayDateObj)) {
+                            filteredTasks.add(task);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Date parse error: " + e.getMessage());
+                    }
+                    break;
+                case "all":
+                    filteredTasks.add(task);
+                    break;
+            }
+        }
+        
+        // Update display list
+        taskList.clear();
+        taskList.addAll(filteredTasks);
+        taskAdapter.notifyDataSetChanged();
+        
+        // Update empty state
+        if (emptyStateTextView != null) {
+            if (taskList.isEmpty()) {
+                emptyStateTextView.setVisibility(View.VISIBLE);
+                switch (currentFilter) {
+                    case "today":
+                        emptyStateTextView.setText("No tasks for today");
+                        break;
+                    case "upcoming":
+                        emptyStateTextView.setText("No upcoming tasks");
+                        break;
+                    case "past":
+                        emptyStateTextView.setText("No past tasks");
+                        break;
+                    case "all":
+                        emptyStateTextView.setText("No tasks found");
+                        break;
+                }
+            } else {
+                emptyStateTextView.setVisibility(View.GONE);
+            }
+        }
+        
+        // Update counts based on filtered results
+        updateTaskCounts();
+        
+        Log.d(TAG, "Filtered tasks: " + filteredTasks.size() + " for filter: " + currentFilter);
+    }
+    
+    /**
+     * Load all tasks for filtering (not just today's)
+     */
+    private void loadAllTasksForFilter() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = prefs.getString("user_id", "");
+        
+        TaskManager taskManager = new TaskManager(requireContext(), new TaskManager.TaskListener() {
+            @Override
+            public void onTasksLoaded(List<Task> tasks) {
+                if (!isAdded()) return;
+                
+                allTasksList.clear();
+                allTasksList.addAll(tasks);
+                filterTasks();
+                
+                Log.d(TAG, "Loaded all tasks for filtering: " + tasks.size());
+            }
+            
+            @Override
+            public void onTaskAdded(Task task) {}
+            
+            @Override
+            public void onTaskUpdated(Task task) {}
+            
+            @Override
+            public void onTaskDeleted(String taskId) {}
+            
+            @Override
+            public void onHabitStreakUpdated(String taskId, int newStreak) {}
+            
+            @Override
+            public void onError(String message) {
+                Log.e(TAG, "Error loading all tasks: " + message);
+            }
+        });
+        
+        // Load all tasks without date filter
+        taskManager.loadAllTasks();
     }
 }
