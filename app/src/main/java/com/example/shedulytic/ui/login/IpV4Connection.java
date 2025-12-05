@@ -16,7 +16,7 @@ public class IpV4Connection {
 
     // Your primary server IP. This will be the first one tried.
     // UPDATE THIS IP WHEN YOUR SERVER IP CHANGES
-    private static final String YOUR_PRIMARY_SERVER_IP = "10.95.189.64";
+    private static final String YOUR_PRIMARY_SERVER_IP = "10.165.170.64";
 
     private static final String[] FALLBACK_URLS = {
             "http://" + YOUR_PRIMARY_SERVER_IP + "/shedulytic/",      // Your primary server
