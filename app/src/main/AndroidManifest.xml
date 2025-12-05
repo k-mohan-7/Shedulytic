@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.shedulytic">    <uses-permission android:name="android.permission.INTERNET" />
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -112,10 +112,10 @@
         <receiver android:name=".ReminderNotificationManager$ReminderReceiver" android:exported="false" />
         <receiver android:name=".ReminderNotificationManager$ReminderActionReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="com.example.shedulytic.COMPLETE_TASK" />
-                <action android:name="com.example.shedulytic.CANT_COMPLETE" />
-                <action android:name="com.example.shedulytic.SNOOZE_TASK" />
-                <action android:name="com.example.shedulytic.DISMISS_REMINDER" />
+                <action android:name="com.simats.schedulytic.COMPLETE_TASK" />
+                <action android:name="com.simats.schedulytic.CANT_COMPLETE" />
+                <action android:name="com.simats.schedulytic.SNOOZE_TASK" />
+                <action android:name="com.simats.schedulytic.DISMISS_REMINDER" />
             </intent-filter>
         </receiver>
 

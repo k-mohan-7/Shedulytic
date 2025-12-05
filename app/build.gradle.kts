@@ -13,11 +13,11 @@ java {
 }
 
 android {
-    namespace = "com.example.shedulytic"
+    namespace = "com.simats.schedulytic"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.shedulytic"
+        applicationId = "com.simats.schedulytic"
         minSdk = 24
         targetSdk = 35
 
