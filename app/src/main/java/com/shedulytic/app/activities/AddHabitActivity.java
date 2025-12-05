@@ -1,4 +1,4 @@
-package com.schedlytic.app.activities;
+package com.shedulytic.app.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;

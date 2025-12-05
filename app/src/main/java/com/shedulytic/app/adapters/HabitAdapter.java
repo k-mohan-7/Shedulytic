@@ -1,4 +1,4 @@
-package com.schedlytic.app.adapters;
+package com.shedulytic.app.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.shedulytic.R;
-import com.schedlytic.app.models.Habit;
+import com.shedulytic.app.models.Habit;
 
 import java.util.List;
 

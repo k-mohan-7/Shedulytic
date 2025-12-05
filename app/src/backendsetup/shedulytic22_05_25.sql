@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `schedlytic`
+-- Database: `shedulytic`
 --
 
 -- --------------------------------------------------------
@@ -148,8 +148,8 @@ INSERT INTO `tasks` (`id`, `user_id`, `task_type`, `title`, `description`, `remi
 (31, 6, 'workflow', 'walkthere', '', 0, 0, 0, 0, '2025-05-14 00:00:00', '2025-05-14 00:00:00', '2025-05-14 00:00:00', 'completed', 'none', 'medium', 0, 0, '2025-05-14 03:40:26', '2025-05-14 15:04:40', 0, NULL),
 (32, 6, '', 'udhdnk', '', 0, 0, 0, 0, '2025-05-14 00:00:00', '2025-05-14 00:00:00', '2025-05-14 00:00:00', 'completed', 'none', 'medium', 0, 0, '2025-05-14 03:46:51', '2025-05-14 15:04:37', 0, NULL),
 (33, 6, 'workflow', 'testfromdb', '', 0, 0, 0, 0, '2025-05-15 00:00:00', '2025-05-15 00:00:00', '2025-05-15 00:00:00', 'pending', 'none', 'medium', 0, 0, '2025-05-14 03:49:31', '2025-05-15 17:27:56', 0, NULL),
-(34, 6, '', 'Complete project documentation', 'Finish writing the technical documentation for the Schedlytic project', 0, 0, 0, 0, '2025-05-15 16:12:27', '2025-05-15 16:12:34', '2025-05-15 00:00:00', 'pending', 'none', 'high', 0, 0, '2025-05-15 03:43:01', '2025-05-15 17:28:06', 0, NULL),
-(35, 6, '', 'Complete project documentation', 'Finish writing the technical documentation for the Schedlytic project', 0, 0, 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2025-05-20 00:00:00', 'pending', 'none', 'high', 0, 0, '2025-05-15 11:01:00', '2025-05-15 11:01:00', 0, NULL),
+(34, 6, '', 'Complete project documentation', 'Finish writing the technical documentation for the Shedulytic project', 0, 0, 0, 0, '2025-05-15 16:12:27', '2025-05-15 16:12:34', '2025-05-15 00:00:00', 'pending', 'none', 'high', 0, 0, '2025-05-15 03:43:01', '2025-05-15 17:28:06', 0, NULL),
+(35, 6, '', 'Complete project documentation', 'Finish writing the technical documentation for the Shedulytic project', 0, 0, 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2025-05-20 00:00:00', 'pending', 'none', 'high', 0, 0, '2025-05-15 11:01:00', '2025-05-15 11:01:00', 0, NULL),
 (36, 6, '', 'check1', '', 0, 0, 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2025-05-15 00:00:00', 'pending', 'none', 'medium', 0, 0, '2025-05-15 17:02:24', '2025-05-15 17:28:03', 0, NULL),
 (37, 6, 'workflow', 'hellothere', '', 0, 0, 0, 0, '2025-05-15 20:48:51', '2025-05-15 22:48:36', '2025-05-15 00:00:00', 'completed', 'none', 'medium', 0, 0, '2025-05-15 17:15:11', '2025-05-15 17:28:49', 0, NULL),
 (38, 6, 'workflow', 'check2', '', 0, 0, 0, 0, '0000-00-00 00:00:00', '0000-00-00 00:00:00', '2025-05-15 00:00:00', 'completed', 'none', 'medium', 0, 0, '2025-05-15 17:28:33', '2025-05-15 17:28:48', 0, NULL),

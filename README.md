@@ -240,7 +240,7 @@ The application uses a MySQL database with the following key tables:
    - `test_api.php` - API endpoint testing
 
 #### **Database Migration Files**
-- `schedlytic22_05_25.sql` - Initial database schema
+- `shedulytic22_05_25.sql` - Initial database schema
 - `V4__add_habit_streaks.sql` - Streak tracking enhancements
 - `create_activity_table.php` - Activity tracking setup
 
@@ -284,7 +284,7 @@ The application uses a MySQL database with the following key tables:
 
 #### **Backend Setup**
 1. Set up LAMP/WAMP/XAMPP stack
-2. Import database schema from `schedlytic22_05_25.sql`
+2. Import database schema from `shedulytic22_05_25.sql`
 3. Configure database connection in `db_connect.php`
 4. Deploy PHP files to web server
 5. Update app configuration with server URLs

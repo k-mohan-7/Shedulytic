@@ -1,4 +1,4 @@
-package com.schedlytic.app.models;
+package com.shedulytic.app.models;
 
 public class Habit {
     private int id;

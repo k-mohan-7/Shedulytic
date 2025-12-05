@@ -251,7 +251,7 @@ public class NotificationTestHelper {
             Log.d(TAG, "✓ NotificationHandler initialized");
             Log.d(TAG, "✓ Notification channels created");
             Log.d(TAG, "✓ Three channels available:");
-            Log.d(TAG, "  - Main channel (schedlytic_channel)");
+            Log.d(TAG, "  - Main channel (shedulytic_channel)");
             Log.d(TAG, "  - Workflow channel (workflow_channel)");
             Log.d(TAG, "  - Reminder channel (reminder_channel)");
             Log.d(TAG, "✓ Supported notification types:");

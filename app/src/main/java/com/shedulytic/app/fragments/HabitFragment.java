@@ -1,4 +1,4 @@
-package com.schedlytic.app.fragments;
+package com.shedulytic.app.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,9 +27,9 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shedulytic.R;
-import com.schedlytic.app.activities.AddHabitActivity;
-import com.schedlytic.app.adapters.HabitAdapter;
-import com.schedlytic.app.models.Habit;
+import com.shedulytic.app.activities.AddHabitActivity;
+import com.shedulytic.app.adapters.HabitAdapter;
+import com.shedulytic.app.models.Habit;
 import com.shedulytic.app.utils.Constants;
 
 import org.json.JSONArray;
