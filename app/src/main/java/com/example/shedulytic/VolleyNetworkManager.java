@@ -36,8 +36,8 @@ import java.util.Locale;
  */
 public class VolleyNetworkManager {
     private static final String TAG = "VolleyNetworkManager";
-    // Primary IP should match IpV4Connection.java for consistency
-    private static final String BASE_URL = "http://10.165.170.64/shedulytic/";
+    // Primary URL should match IpV4Connection.java for consistency
+    private static final String BASE_URL = "http://14.139.187.229:8081/jan2025/Shedulytic/";
     private static final String FALLBACK_URL = "http://localhost/shedulytic/";
     private static final String LOCAL_URL = "http://10.0.2.2/shedulytic/";
     

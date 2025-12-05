@@ -14,13 +14,12 @@ import java.util.Locale;
 public class IpV4Connection {
     private static final String TAG = "IpV4Connection";
 
-    // Your primary server IP. This will be the first one tried.
-    // UPDATE THIS IP WHEN YOUR SERVER IP CHANGES
-    private static final String YOUR_PRIMARY_SERVER_IP = "10.165.170.64";
+    // Your primary hosted server URL
+    // UPDATE THIS URL WHEN YOUR SERVER CHANGES
+    private static final String PRIMARY_SERVER_URL = "http://14.139.187.229:8081/jan2025/Shedulytic/";
 
     private static final String[] FALLBACK_URLS = {
-            "http://" + YOUR_PRIMARY_SERVER_IP + "/shedulytic/",      // Your primary server
-            "http://" + YOUR_PRIMARY_SERVER_IP + ":80/shedulytic/",   // Your primary server with explicit port
+            PRIMARY_SERVER_URL,      // Your hosted server
             "http://10.0.2.2/shedulytic/",          // Android emulator special IP for host localhost
             "http://10.0.2.2:80/shedulytic/",       // Android emulator with explicit port
             // Add other potential IPs or hostnames if needed, but the above are most common for development.

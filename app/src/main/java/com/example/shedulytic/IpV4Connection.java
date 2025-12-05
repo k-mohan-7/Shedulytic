@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 public class IpV4Connection {
     private static final String TAG = "IpV4Connection";
     
-    // Use direct server connection URLs prioritizing your actual IP
-    private static final String BASE_URL = "http://10.165.170.64/shedulytic/";
-    // Additional server URLs with your actual IP as priority
+    // Use direct server connection URLs prioritizing your hosted server
+    private static final String BASE_URL = "http://14.139.187.229:8081/jan2025/Shedulytic/";
+    // Additional server URLs with your hosted server as priority
     private static final String[] SERVER_URLS = {
-        "http://10.165.170.64/shedulytic/",
+        "http://14.139.187.229:8081/jan2025/Shedulytic/",
         "http://localhost/shedulytic/",
         "http://10.0.2.2/shedulytic/"
     };
