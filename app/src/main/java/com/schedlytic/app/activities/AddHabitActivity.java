@@ -22,7 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.shedulytic.R;
-import com.schedlytic.app.utils.Constants;
+import com.shedulytic.app.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;

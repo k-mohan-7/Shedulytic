@@ -19,13 +19,13 @@ public class IpV4Connection {
     private static final String YOUR_PRIMARY_SERVER_IP = "10.95.189.64";
 
     private static final String[] FALLBACK_URLS = {
-            "http://" + YOUR_PRIMARY_SERVER_IP + "/schedlytic/",      // Your primary server
-            "http://" + YOUR_PRIMARY_SERVER_IP + ":80/schedlytic/",   // Your primary server with explicit port
-            "http://10.0.2.2/schedlytic/",          // Android emulator special IP for host localhost
-            "http://10.0.2.2:80/schedlytic/",       // Android emulator with explicit port
+            "http://" + YOUR_PRIMARY_SERVER_IP + "/shedulytic/",      // Your primary server
+            "http://" + YOUR_PRIMARY_SERVER_IP + ":80/shedulytic/",   // Your primary server with explicit port
+            "http://10.0.2.2/shedulytic/",          // Android emulator special IP for host localhost
+            "http://10.0.2.2:80/shedulytic/",       // Android emulator with explicit port
             // Add other potential IPs or hostnames if needed, but the above are most common for development.
-            // "http://127.0.0.1/schedlytic/", // Usually not for emulator to host unless special setup
-            // "http://localhost/schedlytic/"   // Usually not for emulator to host unless special setup
+            // "http://127.0.0.1/shedulytic/", // Usually not for emulator to host unless special setup
+            // "http://localhost/shedulytic/"   // Usually not for emulator to host unless special setup
     };
 
     private static String cachedWorkingUrl = null;
@@ -77,7 +77,7 @@ public class IpV4Connection {
         HttpURLConnection connection = null;
         try {
             // It's crucial that 'ping.php' (or a similar lightweight endpoint)
-            // exists at the root of your '/schedlytic/' directory on the server.
+            // exists at the root of your '/shedulytic/' directory on the server.
             URL url = new URL(baseUrlString + "ping.php");
             Log.d(TAG, "Attempting to ping: " + url.toString());
 

@@ -1,7 +1,7 @@
 <?php
 // Database connection details
 $host = 'localhost';
-$db = 'schedlytic';
+$db = 'shedulytic';
 $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';

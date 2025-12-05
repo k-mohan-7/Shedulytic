@@ -878,7 +878,7 @@ public class TaskManager {
         try {
             String[] ipUrls = {
                 IpV4Connection.getBaseUrl() + "update_task.php",  // Use centralized IP
-                "http://10.0.2.2/schedlytic/update_task.php"
+                "http://10.0.2.2/shedulytic/update_task.php"
             };
             
             SharedPreferences prefs = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
@@ -1215,7 +1215,7 @@ public class TaskManager {
         try {            // Get direct IP addresses to try - use centralized IP configuration
             String[] ipAddresses = {
                 IpV4Connection.getBaseUrl() + "add_task.php",  // Use centralized IP
-                "http://10.0.2.2/schedlytic/add_task.php"
+                "http://10.0.2.2/shedulytic/add_task.php"
             };
             
             // Convert task to JSON

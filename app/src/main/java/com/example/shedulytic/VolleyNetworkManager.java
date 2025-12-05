@@ -37,9 +37,9 @@ import java.util.Locale;
 public class VolleyNetworkManager {
     private static final String TAG = "VolleyNetworkManager";
     // Primary IP should match IpV4Connection.java for consistency
-    private static final String BASE_URL = "http://10.95.189.64/schedlytic/";
-    private static final String FALLBACK_URL = "http://localhost/schedlytic/";
-    private static final String LOCAL_URL = "http://10.0.2.2/schedlytic/";
+    private static final String BASE_URL = "http://10.95.189.64/shedulytic/";
+    private static final String FALLBACK_URL = "http://localhost/shedulytic/";
+    private static final String LOCAL_URL = "http://10.0.2.2/shedulytic/";
     
     // Reduced timeouts for better performance 
     private static final int DEFAULT_TIMEOUT_MS = 3000; // 3 seconds instead of 5

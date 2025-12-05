@@ -1,7 +1,7 @@
 <?php
 // Database connection
 $host = 'localhost';
-$dbname = 'schedlytic';
+$dbname = 'shedulytic';
 $username = 'root'; // Replace with your database username
 $password = '';     // Replace with your database password
 

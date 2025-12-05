@@ -91,8 +91,8 @@ public class NetworkUtils {
         // Try all possible URLs to ensure we can connect to at least one
         String[] urlsToTry = {
             IpV4Connection.getBaseUrl(),  // Use centralized IP configuration
-            "http://localhost/schedlytic/",
-            "http://10.0.2.2/schedlytic/"
+            "http://localhost/shedulytic/",
+            "http://10.0.2.2/shedulytic/"
         };
         
         for (String urlToTest : urlsToTry) {
@@ -182,7 +182,7 @@ public class NetworkUtils {
             return false;
         }
         
-        String testUrl = "http://" + ipAddress + "/schedlytic/ping.php";
+        String testUrl = "http://" + ipAddress + "/shedulytic/ping.php";
         Log.d(TAG, "Testing specific IP connectivity to: " + testUrl);
         
         return testUrlConnectivity(testUrl);

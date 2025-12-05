@@ -29,8 +29,8 @@ import java.util.Locale;
 
 public class NotificationHandler {
     private static final String TAG = "NotificationHandler";
-    private static final String CHANNEL_ID = "schedlytic_channel";
-    private static final String CHANNEL_NAME = "Schedlytic Notifications";
+    private static final String CHANNEL_ID = "shedulytic_channel";
+    private static final String CHANNEL_NAME = "Shedulytic Notifications";
     private static final String WORKFLOW_CHANNEL_ID = "workflow_channel";
     private static final String REMINDER_CHANNEL_ID = "reminder_channel";
     private static final int NOTIFICATION_ID = 1000;
@@ -65,7 +65,7 @@ public class NotificationHandler {
                     CHANNEL_ID,
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH);
-            mainChannel.setDescription("Main channel for Schedlytic app notifications");
+            mainChannel.setDescription("Main channel for Shedulytic app notifications");
             mainChannel.enableLights(true);
             mainChannel.enableVibration(true);
             notificationManager.createNotificationChannel(mainChannel);
@@ -613,7 +613,7 @@ public class NotificationHandler {
                 // Default notification
                 builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_notifications)
-                        .setContentTitle("Schedlytic")
+                        .setContentTitle("Shedulytic")
                         .setContentText(taskTitle)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             }

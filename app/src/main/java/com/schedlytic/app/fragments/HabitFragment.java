@@ -30,7 +30,7 @@ import com.example.shedulytic.R;
 import com.schedlytic.app.activities.AddHabitActivity;
 import com.schedlytic.app.adapters.HabitAdapter;
 import com.schedlytic.app.models.Habit;
-import com.schedlytic.app.utils.Constants;
+import com.shedulytic.app.utils.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;

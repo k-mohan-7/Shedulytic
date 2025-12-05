@@ -12,12 +12,12 @@ public class IpV4Connection {
     private static final String TAG = "IpV4Connection";
     
     // Use direct server connection URLs prioritizing your actual IP
-    private static final String BASE_URL = "http://10.95.189.64/schedlytic/";
+    private static final String BASE_URL = "http://10.95.189.64/shedulytic/";
     // Additional server URLs with your actual IP as priority
     private static final String[] SERVER_URLS = {
-        "http://10.95.189.64/schedlytic/",
-        "http://localhost/schedlytic/",
-        "http://10.0.2.2/schedlytic/"
+        "http://10.95.189.64/shedulytic/",
+        "http://localhost/shedulytic/",
+        "http://10.0.2.2/shedulytic/"
     };
 
     private static String cachedWorkingUrl = null;

@@ -60,8 +60,8 @@ public class LoginActivity extends AppCompatActivity {
                 // Try multiple server URLs in sequence - primary IP should match IpV4Connection
                 String[] serverUrls = {
                     IpV4Connection.getBaseUrl(),  // Use centralized IP configuration
-                    "http://10.0.2.2/schedlytic/",
-                    "http://localhost/schedlytic/"
+                    "http://10.0.2.2/shedulytic/",
+                    "http://localhost/shedulytic/"
                 };
                 
                 boolean connected = false;
